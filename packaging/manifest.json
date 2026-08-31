@@ -1,0 +1,65 @@
+{
+  "manifest_version": "0.3",
+  "name": "mcp-pequerecetas",
+  "display_name": "Pequerecetas",
+  "version": "0.1.0",
+  "description": "MCP server for Pequerecetas. Read Spanish family recipes and rescale their quantities. No API key required.",
+  "long_description": "Read recipes from Pequerecetas, a Spanish home-cooking site written for families, in an MCP client. Search by dish or ingredient, read a recipe with its ingredients, steps and times, and browse the eight taxonomies the site files its recipes under, including the appliance a dish is cooked in and the age of whoever eats it, from six months up. Any recipe can be rescaled to another number of people, and every line says whether the arithmetic was exact or had to move to a quantity a kitchen can measure out. Read-only, no API key and no account.",
+  "author": {
+    "name": "Damien Bouissou",
+    "url": "https://github.com/smeet666"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smeet666/mcp-pequerecetas.git"
+  },
+  "homepage": "https://github.com/smeet666/mcp-pequerecetas#readme",
+  "documentation": "https://github.com/smeet666/mcp-pequerecetas#readme",
+  "support": "https://github.com/smeet666/mcp-pequerecetas/issues",
+  "icon": "assets/icon-512.png",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "pequerecetas",
+    "recipes",
+    "cooking",
+    "spanish-recipes"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"]
+    }
+  },
+  "tools": [
+    {
+      "name": "get_recipe",
+      "description": "Read one recipe: ingredients, steps and times, rescaled to a number of people on request."
+    },
+    {
+      "name": "search_recipes",
+      "description": "Find recipes by dish or by ingredient, in Spanish."
+    },
+    {
+      "name": "list_facets",
+      "description": "List the values the site browses its recipes by, from diet to the age of whoever eats them."
+    },
+    {
+      "name": "browse_recipes",
+      "description": "Read the recipes one taxonomy holds, page by page."
+    },
+    {
+      "name": "scale_ingredients",
+      "description": "Rescale any Spanish ingredient list, saying for each line how exact the result is."
+    }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=24.0.0"
+    }
+  }
+}
