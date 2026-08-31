@@ -12,6 +12,7 @@
  */
 
 import type { Config, Logger } from "../config.js";
+import { createLogger, loadConfig } from "../config.js";
 import { invalidInput } from "../errors.js";
 import type { FacetListing, Listing, Read } from "../types.js";
 import { Cache } from "./cache.js";
@@ -30,10 +31,24 @@ import {
 } from "./urls.js";
 
 export interface ClientOptions {
-  config: Config;
-  logger: Logger;
+  /** Settings. Read from the environment when none are given. */
+  config?: Config;
+  /** Where diagnostics go. Built from the configured level when none is given. */
+  logger?: Logger;
   fetchImpl?: typeof fetch;
 }
+
+/**
+ * What the layer publishes for a program importing it on its own.
+ *
+ * A caller building this client needs a configuration and a logger to change
+ * how it paces itself or where its diagnostics go, so both come from here
+ * rather than from a second import a consumer has to find.
+ */
+export { createLogger, loadConfig } from "../config.js";
+export type { Config, LogLevel, Logger } from "../config.js";
+export { PequerecetasError } from "../errors.js";
+export type { ErrorCode } from "../errors.js";
 
 export class PequerecetasClient {
   private readonly config: Config;
@@ -44,17 +59,15 @@ export class PequerecetasClient {
   private readonly listings: Cache<Listing>;
   private readonly facets: Cache<FacetListing>;
 
-  constructor(options: ClientOptions) {
-    this.config = options.config;
-    this.logger = options.logger;
+  constructor(options: ClientOptions = {}) {
+    const config = options.config ?? loadConfig();
+    this.config = config;
+    this.logger = options.logger ?? createLogger(config.logLevel);
     this.fetchImpl = options.fetchImpl;
-    this.limiter = new RateLimiter({ intervalMs: options.config.minIntervalMs });
-    this.pages = new Cache<ParsedPage>(options.config.cacheTtlMs, options.config.cacheMaxEntries);
-    this.listings = new Cache<Listing>(options.config.cacheTtlMs, options.config.cacheMaxEntries);
-    this.facets = new Cache<FacetListing>(
-      options.config.cacheTtlMs,
-      options.config.cacheMaxEntries,
-    );
+    this.limiter = new RateLimiter({ intervalMs: config.minIntervalMs });
+    this.pages = new Cache<ParsedPage>(config.cacheTtlMs, config.cacheMaxEntries);
+    this.listings = new Cache<Listing>(config.cacheTtlMs, config.cacheMaxEntries);
+    this.facets = new Cache<FacetListing>(config.cacheTtlMs, config.cacheMaxEntries);
   }
 
   /**

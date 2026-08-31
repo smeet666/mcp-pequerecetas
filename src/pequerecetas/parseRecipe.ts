@@ -76,7 +76,7 @@ export type ParsedPage =
 export function parseRecipePage(html: string, id: string): ParsedPage {
   const node = findRecipeNode(html, id);
   const body = postContent(html);
-  const fields = dynamicFields(body);
+  const fields = headerFields(html);
 
   const common = {
     id,
@@ -394,9 +394,18 @@ function postContent(html: string): string {
   return html.slice(match.index + match[0].length);
 }
 
-/** The values the theme prints above an article: a time, a count, an energy. */
-function dynamicFields(body: string): string[] {
-  return [...body.matchAll(DYNAMIC_FIELD)]
+/**
+ * The values the theme prints above an article: a time, a count, an energy.
+ *
+ * They sit in the header, outside the container the article's own words are in,
+ * so they are read from what comes before it. Reading the whole document would
+ * take the same fields from the cards the page suggests underneath, and report
+ * another recipe's time as this one's.
+ */
+function headerFields(html: string): string[] {
+  const opening = POST_CONTENT.exec(html);
+  const header = opening === null ? html : html.slice(0, opening.index);
+  return [...header.matchAll(DYNAMIC_FIELD)]
     .map((match) => {
       /* v8 ignore next -- the pattern that matched carries this group. */
       const inner = match[1] ?? "";

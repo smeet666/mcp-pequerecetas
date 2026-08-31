@@ -19,6 +19,30 @@ const VOWEL_ENDING = /[aeiou]$/i;
 const Z_ENDING = /z$/i;
 const CES_ENDING = /ces$/i;
 const ES_ENDING = /es$/i;
+/**
+ * A word whose written accent falls on its last syllable, before -n or -s.
+ *
+ * Spanish writes that accent because the stress is where the rule would not put
+ * it. Adding a syllable moves the stress back to where the rule expects it, so
+ * the accent is no longer written: limón becomes limones, jamón jamones.
+ */
+const FINAL_STRESS = /([áéíóú])([ns])$/i;
+const UNSTRESSED_ENDING: Record<string, string> = {
+  á: "a",
+  é: "e",
+  í: "i",
+  ó: "o",
+  ú: "u",
+};
+/** The same pair, seen from the plural: -ones, -anes, -eses. */
+const RESTORES_ACCENT = /([aeiou])([ns])es$/i;
+const ACCENTED_VOWEL: Record<string, string> = {
+  a: "á",
+  e: "é",
+  i: "í",
+  o: "ó",
+  u: "ú",
+};
 const TRAILING_S = /s$/i;
 /**
  * A word whose singular already carries the -s that its plural repeats.
@@ -336,6 +360,16 @@ export function spanishSingular(word: string): string {
   if (CES_ENDING.test(word)) {
     return `${word.slice(0, -3)}z`;
   }
+  const stressed = RESTORES_ACCENT.exec(word);
+  if (stressed !== null && word.length > 5) {
+    /* v8 ignore next -- the pattern captured the vowel it matched on. */
+    const matched = stressed[1] ?? "";
+    /* v8 ignore next -- and the consonant that followed it. */
+    const ending = stressed[2] ?? "";
+    /* v8 ignore next -- the vowel matched is one of the five in the table. */
+    const vowel = ACCENTED_VOWEL[matched.toLowerCase()] ?? "";
+    return `${word.slice(0, -4)}${vowel}${ending}`;
+  }
   if (UNCHANGED_PLURAL.test(word)) {
     return word;
   }
@@ -355,6 +389,16 @@ export function spanishPlural(word: string): string {
   }
   if (Z_ENDING.test(word)) {
     return `${word.slice(0, -1)}ces`;
+  }
+  const stressed = FINAL_STRESS.exec(word);
+  if (stressed !== null) {
+    /* v8 ignore next -- the pattern captured the accented vowel. */
+    const matched = stressed[1] ?? "";
+    /* v8 ignore next -- and the consonant that followed it. */
+    const ending = stressed[2] ?? "";
+    /* v8 ignore next -- the vowel matched is one of the five in the table. */
+    const vowel = UNSTRESSED_ENDING[matched.toLowerCase()] ?? "";
+    return `${word.slice(0, -2)}${vowel}${ending}es`;
   }
   if (VOWEL_ENDING.test(word)) {
     return `${word}s`;
@@ -580,11 +624,12 @@ function writesExactly(value: number): boolean {
 /**
  * Render a measure for a given amount, choosing singular or plural.
  *
- * Spanish marks the plural for everything that is not exactly one, so 1,5 takes
+ * A kitchen says "media cucharadita" and "un cuarto de cucharadita", so a share
+ * of one keeps the singular; the plural starts above one, which is why 1,5 takes
  * it: "1,5 cucharadas".
  */
 export function formatUnit(unit: UnitInfo, amount: number): string {
-  if (unit.symbol === true || amount === 1) {
+  if (unit.symbol === true || amount <= 1) {
     return unit.canonical;
   }
   return unit.plural ?? spanishPlural(unit.canonical);

@@ -259,14 +259,22 @@ error vocabulary, and no protocol attached.
 
 ```ts
 import { PequerecetasClient } from "mcp-pequerecetas/client";
-import { createLogger, loadConfig } from "mcp-pequerecetas/client";
+
+const client = new PequerecetasClient();
+const read = await client.getRecipe("paella-de-marisco");
+```
+
+Built with nothing, it takes its settings from the environment and sends its
+diagnostics to stderr. `loadConfig` and `createLogger` come from the same entry
+point for a caller who would rather set them in code:
+
+```ts
+import { createLogger, loadConfig, PequerecetasClient } from "mcp-pequerecetas/client";
 
 const client = new PequerecetasClient({
-  config: loadConfig(),
-  logger: createLogger("error"),
+  config: { ...loadConfig(), minIntervalMs: 5000 },
+  logger: createLogger("debug"),
 });
-
-const read = await client.getRecipe("paella-de-marisco");
 ```
 
 Every read returns `{ data, cached }`, and `cached` says whether the answer came
@@ -577,14 +585,22 @@ vocabulaire d'erreurs, sans protocole attaché.
 
 ```ts
 import { PequerecetasClient } from "mcp-pequerecetas/client";
-import { createLogger, loadConfig } from "mcp-pequerecetas/client";
+
+const client = new PequerecetasClient();
+const read = await client.getRecipe("paella-de-marisco");
+```
+
+Construit sans rien, il prend ses réglages dans l'environnement et envoie ses
+diagnostics sur stderr. `loadConfig` et `createLogger` viennent du même point
+d'entrée pour qui préfère les fixer dans le code :
+
+```ts
+import { createLogger, loadConfig, PequerecetasClient } from "mcp-pequerecetas/client";
 
 const client = new PequerecetasClient({
-  config: loadConfig(),
-  logger: createLogger("error"),
+  config: { ...loadConfig(), minIntervalMs: 5000 },
+  logger: createLogger("debug"),
 });
-
-const read = await client.getRecipe("paella-de-marisco");
 ```
 
 Toute lecture rend `{ data, cached }`, et `cached` dit si la réponse vient du

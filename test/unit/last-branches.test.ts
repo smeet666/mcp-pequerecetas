@@ -116,7 +116,7 @@ describe("a page that prints its badges in another order, or not at all", () => 
     });
     const field = (value: string) =>
       `<div class="jet-listing-dynamic-field__content" >${value}</div>`;
-    const html = `<html><head><script type="application/ld+json">${block}</script></head><body><div class="post-content">${field("8 rac.")}${field("45 min.")}</div></body></html>`;
+    const html = `<html><head><script type="application/ld+json">${block}</script></head><body>${field("8 rac.")}${field("45 min.")}<div class="post-content"></div></body></html>`;
     const parsed = parseRecipePage(html, "raciones-primero");
     expect(parsed.kind === "recipe" && parsed.recipe.total_minutes).toBe(45);
   });
@@ -128,7 +128,7 @@ describe("a page that prints its badges in another order, or not at all", () => 
       name: "Sin tiempo",
       recipeIngredient: ["1 huevo"],
     });
-    const html = `<html><head><script type="application/ld+json">${block}</script></head><body><div class="post-content"><div class="jet-listing-dynamic-field__content" >8 rac.</div></div></body></html>`;
+    const html = `<html><head><script type="application/ld+json">${block}</script></head><body><div class="jet-listing-dynamic-field__content" >8 rac.</div><div class="post-content"></div></body></html>`;
     const parsed = parseRecipePage(html, "sin-tiempo");
     expect(parsed.kind === "recipe" && parsed.recipe.total_minutes).toBeNull();
   });
@@ -170,6 +170,24 @@ describe("what a rendering leaves out when the page published nothing", () => {
     await vi.runAllTimersAsync();
     const result = await call;
     expect(result.content[0]?.text).toMatch(/Colección escueta\n\nThis page gathers/);
+  });
+});
+
+describe("the reading layer imported as an ordinary library", () => {
+  it("builds with nothing at all, the way its own documentation shows", () => {
+    expect(() => new PequerecetasClient()).not.toThrow();
+  });
+
+  it("takes its settings from the environment when none are given", () => {
+    const client = new PequerecetasClient();
+    expect(client.currentIntervalMs).toBe(3000);
+  });
+
+  it("still takes a configuration when one is handed to it", () => {
+    const client = new PequerecetasClient({
+      config: { ...loadConfig({}), minIntervalMs: 5000 },
+    });
+    expect(client.currentIntervalMs).toBe(5000);
   });
 });
 

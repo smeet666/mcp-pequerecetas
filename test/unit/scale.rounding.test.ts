@@ -63,9 +63,9 @@ describe("a countable thing lands where a kitchen can take it", () => {
 });
 
 describe("a spoon is measured out in halves and in quarters", () => {
-  it("halves a spoonful", () => {
+  it("halves a spoonful, and keeps the measure in the singular under one", () => {
     expect(scaleLine("1 cucharada de azúcar", by(0.5))).toMatchObject({
-      text: "1/2 cucharadas de azúcar",
+      text: "1/2 cucharada de azúcar",
     });
   });
 
@@ -136,5 +136,51 @@ describe("agreement once the number has moved", () => {
 
   it("takes an adjective back to the singular for one", () => {
     expect(scaleLine("4 pimientos rojos", by(0.25)).text).toBe("1 pimiento rojo");
+  });
+});
+
+describe("what a fraction of something does to the words around it", () => {
+  it("keeps a fruit in the singular for half of one", () => {
+    expect(scaleLine("1 limón", by(0.5)).text).toBe("1/2 limón");
+  });
+
+  it("writes the plural of that fruit without its accent", () => {
+    expect(scaleLine("1 limón", by(3)).text).toBe("3 limones");
+  });
+
+  it("keeps a measure in the singular for a quarter of one", () => {
+    expect(scaleLine("1 cucharadita de sal", by(0.25)).text).toBe("1/4 cucharadita de sal");
+  });
+
+  it("keeps a measure in the singular for half of one", () => {
+    expect(scaleLine("1 cucharada de aceite", by(0.5)).text).toBe("1/2 cucharada de aceite");
+  });
+});
+
+describe("what a line says after the words it counts", () => {
+  it("agrees the adjective even where the page closes on a note in brackets", () => {
+    expect(scaleLine("1 pollo pequeño (aprox. 1,25 kg)", by(2)).text).toBe(
+      "2 pollos pequeños (aprox. 1,25 kg)",
+    );
+  });
+
+  it("leaves the words inside those brackets exactly as published", () => {
+    expect(scaleLine("2 cebollas grandes (o tres pequeñas)", by(0.5)).text).toBe(
+      "1 cebolla grande (o tres pequeñas)",
+    );
+  });
+});
+
+describe("fruit a knife takes to quarters", () => {
+  it("quarters a lemon, whose plural moves its written accent", () => {
+    expect(scaleLine("1 limón", by(0.25))).toMatchObject({ amount: 0.25, scaling: "scaled" });
+  });
+
+  it("quarters a peach the same way", () => {
+    expect(scaleLine("1 melocotón", by(0.25))).toMatchObject({ amount: 0.25 });
+  });
+
+  it("keeps counting them in the plural above one", () => {
+    expect(scaleLine("1 limón", by(2)).text).toBe("2 limones");
   });
 });

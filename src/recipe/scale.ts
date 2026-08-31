@@ -41,6 +41,8 @@ const COMBINING_MARK = /[̀-ͯ]/g;
 const PLURAL_ENDING = /s$/i;
 /** A range written with a dash, which stays against the numbers. */
 const DASH_SEPARATOR = /^[-–—]$/;
+/** The word an aside opens on, which the page sets in brackets. */
+const OPENS_ASIDE = /[([]/;
 
 /* -------------------------------------------------------------------------- */
 /* Rounding                                                                    */
@@ -440,7 +442,7 @@ const HALVED_CUT =
  * is left keeps.
  */
 const QUARTERED_ITEM =
-  /\b(?:cebollas?|cebolletas?|chalotas?|patatas?|papas?|zanahorias?|manzanas?|peras?|limones?|naranjas?|tomates?|pepinos?|calabacines?|berenjenas?|calabazas?|coles?|melones?|sandias?|pimientos?|remolachas?|nabos?|puerros?|platanos?|mangos?|aguacates?|pinas?|melocotones?|albaricoques?|quesos?|pollos?|panes?|barras?|chorizos?|morcillas?|bizcochos?)\b/iu;
+  /\b(?:cebollas?|cebolletas?|chalotas?|patatas?|papas?|zanahorias?|manzanas?|peras?|limon(?:es)?|naranjas?|tomates?|pepinos?|calabacin(?:es)?|berenjenas?|calabazas?|coles?|melon(?:es)?|sandias?|pimientos?|remolachas?|nabos?|puerros?|platanos?|mangos?|aguacates?|pinas?|melocoton(?:es)?|albaricoques?|quesos?|pollos?|pan(?:es)?|barras?|chorizos?|morcillas?|bizcochos?)\b/iu;
 
 /**
  * How finely a counted thing divides.
@@ -635,17 +637,17 @@ export function agreeWithAmount(item: string, amount: number): string {
   if (item === "") {
     return "";
   }
-  // Spanish marks the plural for everything that is not exactly one.
-  const wantsPlural = amount !== 1;
+  // A kitchen says "medio limón" and "dos limones": the plural starts above one.
+  const wantsPlural = amount > 1;
   const words = item.split(" ");
   /* v8 ignore next -- splitting a string always yields a first piece. */
   const head = words[0] ?? "";
 
   words[0] = agreeHead(head, wantsPlural);
 
-  const last = words.length - 1;
+  const last = lastWordBeforeAside(words);
   if (last > 0) {
-    /* v8 ignore next -- the index is the last of the list it came from. */
+    /* v8 ignore next -- the index came from finding a word in this very list. */
     const adjective = agreeTrailingAdjective(words[last] ?? "", wantsPlural);
     if (adjective !== null) {
       words[last] = adjective;
@@ -653,6 +655,20 @@ export function agreeWithAmount(item: string, amount: number): string {
   }
 
   return words.join(" ");
+}
+
+/**
+ * Where the phrase itself ends, before any aside the page closed on.
+ *
+ * A page often qualifies what it counts in brackets, as in "1 pollo pequeño
+ * (aprox. 1,25 kg)". The adjective to agree is the last word of the phrase, so
+ * the aside is stepped over; its own words are left exactly as published,
+ * because they describe one of the thing rather than however many are asked
+ * for.
+ */
+function lastWordBeforeAside(words: string[]): number {
+  const opening = words.findIndex((word) => OPENS_ASIDE.test(word));
+  return opening > 0 ? opening - 1 : words.length - 1;
 }
 
 /**

@@ -246,7 +246,7 @@ describe("formatUnit", () => {
     expect(formatUnit(lookupUnit("cucharada")!, 1)).toBe("cucharada");
   });
 
-  it("writes the plural for anything else, which is what Spanish does with a half", () => {
+  it("writes the plural above one", () => {
     expect(formatUnit(lookupUnit("cucharada")!, 1.5)).toBe("cucharadas");
     expect(formatUnit(lookupUnit("cucharada")!, 3)).toBe("cucharadas");
   });
@@ -263,5 +263,37 @@ describe("approximateEquivalent", () => {
 
   it("has nothing to say about a measure with no settled equivalence", () => {
     expect(approximateEquivalent(lookupUnit("g")!)).toBeNull();
+  });
+});
+
+describe("the plural of a word whose last syllable is stressed", () => {
+  it("drops the written accent, because the stress moves off the last syllable", () => {
+    expect(spanishPlural("limón")).toBe("limones");
+    expect(spanishPlural("jamón")).toBe("jamones");
+  });
+
+  it("takes such a plural back to its accented singular", () => {
+    expect(spanishSingular("limones")).toBe("limón");
+    expect(spanishSingular("jamones")).toBe("jamón");
+  });
+
+  it("leaves a word whose stress already falls earlier", () => {
+    expect(spanishPlural("azúcar")).toBe("azúcares");
+  });
+});
+
+describe("the number a fraction of a measure takes", () => {
+  it("keeps the singular below one, which is what a kitchen says", () => {
+    expect(formatUnit(lookupUnit("cucharadita")!, 0.25)).toBe("cucharadita");
+    expect(formatUnit(lookupUnit("cucharada")!, 0.5)).toBe("cucharada");
+  });
+
+  it("keeps the singular at exactly one", () => {
+    expect(formatUnit(lookupUnit("cucharada")!, 1)).toBe("cucharada");
+  });
+
+  it("takes the plural above one", () => {
+    expect(formatUnit(lookupUnit("cucharada")!, 1.5)).toBe("cucharadas");
+    expect(formatUnit(lookupUnit("cucharada")!, 2)).toBe("cucharadas");
   });
 });

@@ -62,7 +62,13 @@ function dynamicFields(values) {
     .join("\n    ");
 }
 
-function page({ title, head = "", body }) {
+/**
+ * One page, with the theme's own header above the words of the article.
+ *
+ * The time, the servings and the energy are printed in that header, outside the
+ * container the article's words sit in, which is where the site prints them.
+ */
+function page({ title, head = "", header = "", body }) {
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -73,6 +79,9 @@ ${head}
 <body>
 ${chrome}
 <main>
+<div class="brxe-container article-header">
+${header}
+</div>
 <div class="brxe-container post-content">
 ${body}
 </div>
@@ -173,12 +182,12 @@ writeFileSync(
       ...surroundingNodes("arroz-caldoso-tia-nube", "Arroz caldoso de la tía Nube"),
       structuredRecipe,
     ]),
-    body: `
-<article>
-  <h1>Arroz caldoso de la tía Nube</h1>
+    header: `<h1>Arroz caldoso de la tía Nube</h1>
   <div class="brxe-block">
     ${dynamicFields(["60 min.", "4 rac.", "320 Kcal", "Un arroz caldoso inventado para la suite de pruebas."])}
-  </div>
+  </div>`,
+    body: `
+<article>
   <p class="wp-block-paragraph">Una receta inventada que no existe en ninguna cocina.</p>
 </article>`,
   }),
@@ -218,12 +227,12 @@ writeFileSync(
       ...surroundingNodes("crema-calabaza-inventada", "Crema de calabaza con nueces inventada"),
       articleRecipeNode,
     ]),
-    body: `
-<article>
-  <h1>Crema de calabaza con nueces inventada</h1>
+    header: `<h1>Crema de calabaza con nueces inventada</h1>
   <div class="brxe-block">
     ${dynamicFields(["30 min.", "6 rac.", "180 Kcal", ""])}
-  </div>
+  </div>`,
+    body: `
+<article>
   <p class="wp-block-paragraph">Una crema inventada que se hace en una sola olla.</p>
   <div id="toc_container" class="no_bullets"><ul class="toc_list"><li><a href="#Ingredientes">Ingredientes</a></li></ul></div>
   <h2 class="wp-block-heading"><span id="Receta">Receta de crema de calabaza</span></h2>
@@ -283,10 +292,10 @@ writeFileSync(
         dateModified: "2026-04-01T10:00:00+02:00",
       },
     ]),
+    header: `<h1>Tortilla de acelgas inventada</h1>
+  <div class="brxe-block">${dynamicFields(["25 min.", ""])}</div>`,
     body: `
 <article>
-  <h1>Tortilla de acelgas inventada</h1>
-  <div class="brxe-block">${dynamicFields(["25 min.", ""])}</div>
   <ul class="wp-block-list">
     <li>6 huevos</li>
     <li>1 manojo de acelgas</li>
@@ -334,10 +343,10 @@ writeFileSync(
         dateModified: "2026-05-20T09:00:00+02:00",
       },
     ]),
+    header: `<h1>12 purés inventados para bebés</h1>
+  <div class="brxe-block">${dynamicFields(["Una selección inventada de purés para la suite de pruebas."])}</div>`,
     body: `
 <article>
-  <h1>12 purés inventados para bebés</h1>
-  <div class="brxe-block">${dynamicFields(["Una selección inventada de purés para la suite de pruebas."])}</div>
   <p class="wp-block-paragraph">Doce purés que nadie ha cocinado nunca.</p>
   <h2 class="wp-block-heading"><span id="Verduras">Purés de verduras inventados</span></h2>
   <p class="wp-block-paragraph">Empezamos por los más suaves.</p>
