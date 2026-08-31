@@ -5,24 +5,33 @@ read-only.
 
 ## What it does
 
-Six tools:
+Five tools:
 
-- **`search_recipes`** — find recipes by dish or ingredient.
-- **`get_recipe`** — read one, rescaled to any number of people on request.
-- **`list_categories`** — the categories recipes are browsed by.
-- **`browse_recipes`** — one category's recipes, page by page.
-- **`get_wine_pairings`** — five wines for a dish, ranked by the site.
-- **`scale_ingredients`** — rescale any French ingredient list, offline.
+- **`get_recipe`**: read one recipe, rescaled to any number of people on request.
+- **`search_recipes`**: find recipes by dish or ingredient, in Spanish.
+- **`list_facets`**: the values each of the eight taxonomies publishes.
+- **`browse_recipes`**: one taxonomy's recipes, page by page.
+- **`scale_ingredients`**: rescale any Spanish ingredient list, offline.
 
 ## What sets it apart
 
-Pequerecetas prints the difficulty, the cost and the resting time on the page
-and puts none of them in its machine-readable block. This server reads both and
-returns all of it.
+Pequerecetas files a recipe by the appliance it is cooked in and by the age of
+whoever eats it, from six months up. Those two axes browse a family kitchen the
+way a family actually asks: what can go in the air fryer, what a nine-month-old
+can eat.
+
+The site serves recipes and articles that merely gather recipes at the same kind
+of address, and describes both with the same machine-readable type. This server
+tells them apart and says which came back, so a collection is never offered as a
+dish to cook. It also reads the two thirds of recipes that keep their
+ingredients in the body of the article rather than in that block, and says which
+reading answered.
 
 Rescaling marks every line: exact, rounded to a measurable amount, or left alone
-for want of a quantity. Half an egg is not an amount, so a count lands on a
-whole one and says so. Units stay in the system the recipe used.
+for want of a quantity. Half an egg is not an amount, so a count lands on a whole
+one and says so. Units stay in the system the recipe used. The site writes
+equipment among the ingredients, and a line naming a tool is marked and carried
+as published however many people the recipe is scaled to.
 
 A time the site publishes no value for comes back as `null`. Searches and
 listings come with no total, because the site prints none.
