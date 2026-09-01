@@ -307,10 +307,50 @@ const NOT_A_MEASURE = new Set([
   "claras",
   "yema",
   "yemas",
+  // What a butcher cut, and the offal sold beside it. A line reading "3 hígados
+  // de pollo" counts livers, and the grammar it is written with is the grammar
+  // of "3 vasitos de yogur": without this list the liver would be read as the
+  // vessel and the answer would call it an approximate measure.
   "pechuga",
   "pechugas",
   "muslo",
   "muslos",
+  "contramuslo",
+  "contramuslos",
+  "higado",
+  "higados",
+  "corazon",
+  "corazones",
+  "molleja",
+  "mollejas",
+  "rinon",
+  "rinones",
+  "lengua",
+  "lenguas",
+  "ala",
+  "alas",
+  "alita",
+  "alitas",
+  "pata",
+  "patas",
+  "costilla",
+  "costillas",
+  "chuleta",
+  "chuletas",
+  "solomillo",
+  "solomillos",
+  "lomo",
+  "lomos",
+  "carrillera",
+  "carrilleras",
+  "rabo",
+  "rabos",
+  "oreja",
+  "orejas",
+  "morro",
+  "morros",
+  "cola",
+  "colas",
 ]);
 
 /**
@@ -611,6 +651,28 @@ export function chooseReadableUnit(unit: UnitInfo, amount: number): ChosenUnit {
   }
 
   return { unit: current, ratio };
+}
+
+/**
+ * The unit above, when the figure as it will be written fits it exactly.
+ *
+ * `chooseReadableUnit` judges on the exact product, and what a reader sees is
+ * that product rounded to what a scale shows. The two can disagree: 9687,5 g
+ * does not fit kilos, and the 9690 g it rounds to is 9,69 kg to the gram. Asked
+ * again once the figure is settled, this puts the two masses of one recipe in
+ * the same unit instead of leaving one in grams beside another in kilos.
+ */
+export function promoteRounded(unit: UnitInfo, amount: number): ChosenUnit | null {
+  const up = PROMOTIONS[normalizeUnitKey(unit.canonical)];
+  if (up === undefined || !Number.isFinite(amount) || amount < up.per) {
+    return null;
+  }
+  if (!writesExactly(amount / up.per)) {
+    return null;
+  }
+  const target = lookupUnit(up.to);
+  /* v8 ignore next -- every ladder names a unit the vocabulary holds. */
+  return target === null ? null : { unit: target, ratio: 1 / up.per };
 }
 
 /** At and above this, rounding costs less than restating the value further down. */

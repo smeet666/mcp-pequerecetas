@@ -297,3 +297,19 @@ describe("the number a fraction of a measure takes", () => {
     expect(formatUnit(lookupUnit("cucharada")!, 2)).toBe("cucharadas");
   });
 });
+
+describe("words that name a part of an animal rather than a measure", () => {
+  it("refuses an offal cut, which is eaten rather than measured with", () => {
+    expect(readPartitiveMeasure("hígados de pollo")).toBeNull();
+    expect(readPartitiveMeasure("corazones de alcachofa")).toBeNull();
+  });
+
+  it("refuses a joint the butcher cut, for the same reason", () => {
+    expect(readPartitiveMeasure("alas de pollo")).toBeNull();
+    expect(readPartitiveMeasure("costillas de cerdo")).toBeNull();
+  });
+
+  it("still reads a container the vocabulary has no entry for", () => {
+    expect(readPartitiveMeasure("cazo de leche")?.unit.canonical).toBe("cazo");
+  });
+});

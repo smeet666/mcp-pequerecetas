@@ -184,3 +184,39 @@ describe("fruit a knife takes to quarters", () => {
     expect(scaleLine("1 limón", by(2)).text).toBe("2 limones");
   });
 });
+
+describe("a pan the recipe is cooked in, written among the ingredients", () => {
+  it("marks the pan this dish is named after", () => {
+    expect(scaleLine("Paella o paellera de 36 cm", by(38.75))).toMatchObject({
+      text: "Paella o paellera de 36 cm",
+      is_equipment: true,
+    });
+  });
+
+  it("says why it was left alone, rather than calling it a quantity nobody gave", () => {
+    expect(scaleLine("Paella o paellera de 36 cm", by(2)).note).toMatch(
+      /tool rather than an ingredient/,
+    );
+  });
+
+  it("leaves the dish itself alone when a line names it with no pan", () => {
+    expect(scaleLine("1 paella de marisco congelada", by(2)).is_equipment).toBe(false);
+  });
+});
+
+describe("a mass large enough for the unit above it", () => {
+  it("climbs to kilos once the rounded figure fits them exactly", () => {
+    expect(scaleLine("250 g de arroz D.O. Valencia", by(38.75))).toMatchObject({
+      text: "9,69 kg de arroz D.O. Valencia",
+      unit: "kg",
+    });
+  });
+
+  it("stays in grams below a full kilo", () => {
+    expect(scaleLine("25 g de aceite de oliva", by(38.75)).unit).toBe("g");
+  });
+
+  it("stays in grams for a figure kilos cannot state", () => {
+    expect(scaleLine("180 g de judías verdes", by(38.75)).unit).toBe("g");
+  });
+});

@@ -34,6 +34,8 @@ const TOOLS = new Set([
   "thermomix",
   "robot",
   "olla",
+  "paellera",
+  "paella",
   "cazuela",
   "cazo",
   "sarten",
@@ -96,6 +98,9 @@ const TOOLS = new Set([
  * of its qualifiers follows.
  */
 const TOOL_QUALIFIERS: Record<string, RegExp> = {
+  // Spanish names the dish and the pan it is cooked in with the same word, so
+  // the pan is the reading only where the line sizes it or names its metal.
+  paella: /\b(?:paellera|cm|acero|hierro|esmaltada|pulido|inducci[oó]n)\b/,
   papel: /\b(?:hornear|horno|aluminio|film|vegetal|absorbente|cocina)\b/,
   vaso: /\b(?:medidor|batidora|thermomix)\b/,
   cuchara: /\b(?:madera|silicona|helado)\b/,
