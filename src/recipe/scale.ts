@@ -27,7 +27,6 @@ import {
   spanishSingular,
   hasEmbeddedMeasure,
   isSpoonMeasure,
-  promoteRounded,
   QUARTERED_MEASURE,
   unitDivisibility,
 } from "./units.js";
@@ -58,9 +57,11 @@ function roundTo(value: number, step: number): number {
  * Round a measured amount to something a kitchen scale can show.
  *
  * Large amounts do not need fine precision and small ones do, so the step grows
- * with the value rather than being fixed. The step stays a tenth in the single
- * digits because a unit can be a livre as easily as a gram, and rounding 2,2
- * livres to 2 would throw away a tenth of the ingredient.
+ * with the value rather than being fixed. A figure states its own precision by
+ * the way it is written, and "6,3 g" of oil claims a tenth of a gram that no
+ * kitchen scale shows and no hand pours, so from five units up the step is the
+ * whole unit. Below five it stays a tenth, because there a tenth is a real
+ * share of the amount: 2,5 g of yeast is not 3 g.
  *
  * A whole number is already what a scale shows, so it is left where the
  * arithmetic put it: 1234 g doubled is 2468 g, and a step of five grams would
@@ -73,7 +74,7 @@ function roundMeasured(value: number): number {
   if (value >= 100) {
     return roundTo(value, 5);
   }
-  if (value >= 10) {
+  if (value >= 5) {
     return roundTo(value, 1);
   }
   if (value >= 1) {
@@ -95,6 +96,11 @@ function isHalfStep(value: number): boolean {
 
 /** Two decimals, which is finer than any kitchen resolves. */
 function trim(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+/** The figure as the line will write it, which is two decimals at most. */
+function writeable(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
@@ -316,8 +322,15 @@ function scaleMeasure(
       // The rounding happens in the smaller of the two units, so moving to a
       // bigger one never throws away precision the page wrote: 1500 g rounded
       // as kilos is 2, and rounded as grams it is the 1,5 kg a scale shows.
+      // Climbing a ladder rounds in the smaller unit, so no precision the page
+      // wrote is thrown away on the way up, and the result is then taken to
+      // what the bigger unit can write: 1562,5 g becomes 1565 g and reads as
+      // 1,57 kg. The amount reported is the one the line shows, so a caller
+      // reading the field never sees a figure the text does not.
       const rounded =
-        ratio < 1 ? Number((roundMeasured(raw) * ratio).toPrecision(12)) : roundMeasured(exact);
+        ratio < 1
+          ? writeable(Number((roundMeasured(raw) * ratio).toPrecision(12)))
+          : roundMeasured(exact);
       // At the bottom of a ladder, keep what precision is left rather than
       // deleting the ingredient.
       /* v8 ignore next -- a product of zero rounds to zero, so the two halves of
@@ -334,11 +347,7 @@ function scaleMeasure(
 
   if (unit !== null && unit.kind === "measured") {
     const chosen = chooseReadableUnit(unit, reference);
-    const measured = inUnit(chosen.unit, chosen.ratio);
-    // Asked again on the figure as it will be written, because rounding can
-    // bring a mass up to a round number of the unit above.
-    const promoted = promoteRounded(chosen.unit, measured.bounds[0].amount);
-    return promoted === null ? measured : inUnit(promoted.unit, chosen.ratio * promoted.ratio);
+    return inUnit(chosen.unit, chosen.ratio);
   }
 
   if (unit !== null && isSpoonMeasure(unit)) {
@@ -437,7 +446,7 @@ const HALVED_ITEM = /\b(?:zumos?|jugos?)\b/iu;
  * differs from the clara it never confuses it with.
  */
 const HALVED_CUT =
-  /\b(?:muslos?|contramuslos?|alitas?|alas?|pechugas?|escalopes?|solomillos?|chuletas?|filetes?\s+de)\b/iu;
+  /\b(?:muslos?|contramuslos?|alitas?|alas?|pechugas?|escalopes?|solomillos?|chuletas?|higados?|corazones?|mollejas?|rinones?|lenguas?|carrilleras?|filetes?\s+de)\b/iu;
 
 /**
  * Produce a knife takes to quarters.

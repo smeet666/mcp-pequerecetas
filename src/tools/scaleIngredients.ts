@@ -23,8 +23,15 @@ export const scaleIngredientsDescription =
 
 const MAX_LINES = 200;
 const MAX_LINE_CHARS = 300;
-const MAX_FACTOR = 100;
+/**
+ * How far a list may be taken.
+ *
+ * A factor reaches as far as two servings counts can ask for, since giving the
+ * counts and giving their quotient are two ways of asking one thing, and the
+ * same figure bounds the servings get_recipe takes.
+ */
 const MAX_SERVINGS = 1000;
+const MAX_FACTOR = MAX_SERVINGS;
 
 export const scaleIngredientsInput = {
   ingredients: z

@@ -28,9 +28,16 @@ describe("the step a mass is rounded to grows with the mass", () => {
   });
 
   it("leaves a whole number where the arithmetic put it", () => {
-    expect(scaleLine("1234 g de harina", by(2))).toMatchObject({
-      text: "2468 g de harina",
+    expect(scaleLine("123 g de harina", by(2))).toMatchObject({
+      text: "246 g de harina",
       scaling: "scaled",
+    });
+  });
+
+  it("states a mass past the kilo in kilos, and says the figure moved", () => {
+    expect(scaleLine("1234 g de harina", by(2))).toMatchObject({
+      text: "2,47 kg de harina",
+      scaling: "rounded",
     });
   });
 });
@@ -216,8 +223,11 @@ describe("a mass large enough for the unit above it", () => {
     expect(scaleLine("25 g de aceite de oliva", by(38.75)).unit).toBe("g");
   });
 
-  it("stays in grams for a figure kilos cannot state", () => {
-    expect(scaleLine("180 g de judías verdes", by(38.75)).unit).toBe("g");
+  it("states a figure kilos cannot hold exactly in kilos all the same", () => {
+    expect(scaleLine("180 g de judías verdes", by(38.75))).toMatchObject({
+      text: "6,98 kg de judías verdes",
+      scaling: "rounded",
+    });
   });
 });
 
