@@ -109,7 +109,7 @@ of servings is given.
 | Argument   | Type                        | Required | What it does                                         |
 | ---------- | --------------------------- | -------- | ---------------------------------------------------- |
 | `id`       | string, 1 to 200 characters | yes      | The slug in a recipe's address, as a row carries it. |
-| `servings` | integer, 1 to 200           | no       | Rescale the quantities to this many.                 |
+| `servings` | integer, 1 to 1000          | no       | Rescale the quantities to this many.                 |
 
 **In return:** `kind`, which reads `recipe` or `collection`. The site publishes
 both at this kind of address and describes them alike, so this is what tells them
@@ -186,12 +186,12 @@ taxonomies cannot be combined: the site offers no way to ask for two at once.
 
 Rescales a list of Spanish ingredient lines. It reaches no site.
 
-| Argument        | Type                             | Required | What it does                        |
-| --------------- | -------------------------------- | -------- | ----------------------------------- |
-| `ingredients`   | array of 1 to 200 strings        | yes      | The lines to rescale, as written.   |
-| `factor`        | number, greater than 0 up to 100 | one of   | What to multiply the quantities by. |
-| `from_servings` | integer, 1 to 1000               | one of   | How many the list was written for.  |
-| `to_servings`   | integer, 1 to 1000               | one of   | How many it should serve.           |
+| Argument        | Type                              | Required | What it does                        |
+| --------------- | --------------------------------- | -------- | ----------------------------------- |
+| `ingredients`   | array of 1 to 200 strings         | yes      | The lines to rescale, as written.   |
+| `factor`        | number, greater than 0 up to 1000 | one of   | What to multiply the quantities by. |
+| `from_servings` | integer, 1 to 1000                | one of   | How many the list was written for.  |
+| `to_servings`   | integer, 1 to 1000                | one of   | How many it should serve.           |
 
 Give `factor`, or `from_servings` and `to_servings` together. Naming both ways at
 once is refused, because they can ask for different things.
@@ -204,27 +204,6 @@ carries no quantity. `is_equipment` marks a line naming a tool. Alongside come
 `scaled_count`, `rounded_count` and `unscaled_count`. Nothing is converted
 between unit systems, and an approximate measure such as a `pizca` keeps the size
 the cook gives it.
-
-## What the site publishes, and what it does not
-
-The recipe section serves two different things at the same kind of address, and
-describes both with the same structured type. Roughly a third of its recipes
-carry their ingredients in that block; most keep them in the body of the article;
-and about one page in seven is an article gathering other recipes. `kind` and
-`source_shape` say which of the three came back.
-
-The site publishes no count anywhere. It prints no figure for what a search
-matched, and none for what a taxonomy holds, so `total_available` is `null` in
-every answer and `has_more` says whether another page follows.
-
-A recipe page states no taxonomy of its own. The taxonomy links printed around it
-belong to the site's navigation and stand identically on every page, so a recipe
-comes back with the rubric labels its own block carries and nothing more. The
-slug a facet browses by is published on the facet's own listing.
-
-The site writes equipment among the ingredients, so a line reading
-`Freidora de aire` arrives in the same list as the chicken. Such a line is marked
-and carried as published, whatever the recipe is scaled to.
 
 ## Configuration
 
@@ -284,7 +263,7 @@ from the store rather than from the site.
 
 One request at a time, three seconds apart, and the interval widens when the site
 pushes back. The User-Agent carries the project's name, its version and an
-address where a person can be reached about traffic the site did not expect.
+address where a person can be reached.
 
 Pequerecetas is free to read and pays for its own hosting. When you show a recipe
 to someone, credit the site and link the page it came from.
@@ -426,7 +405,7 @@ un nombre de parts est donné.
 | Argument   | Type                       | Requis | Ce qu'il fait                               |
 | ---------- | -------------------------- | ------ | ------------------------------------------- |
 | `id`       | chaîne, 1 à 200 caractères | oui    | Le slug dans l'adresse d'une recette.       |
-| `servings` | entier, 1 à 200            | non    | Met les quantités à l'échelle de ce nombre. |
+| `servings` | entier, 1 à 1000           | non    | Met les quantités à l'échelle de ce nombre. |
 
 **En retour :** `kind`, qui vaut `recipe` ou `collection`. Le site publie les deux
 à ce genre d'adresse et les décrit pareillement, donc c'est ce qui les distingue :
@@ -508,12 +487,12 @@ demander deux à la fois.
 Met à l'échelle une liste de lignes d'ingrédients espagnoles. Il ne joint aucun
 site.
 
-| Argument        | Type                              | Requis | Ce qu'il fait                         |
-| --------------- | --------------------------------- | ------ | ------------------------------------- |
-| `ingredients`   | tableau de 1 à 200 chaînes        | oui    | Les lignes à mettre à l'échelle.      |
-| `factor`        | nombre, supérieur à 0 jusqu'à 100 | l'un   | Ce par quoi multiplier les quantités. |
-| `from_servings` | entier, 1 à 1000                  | l'un   | Pour combien la liste a été écrite.   |
-| `to_servings`   | entier, 1 à 1000                  | l'un   | Pour combien elle doit servir.        |
+| Argument        | Type                               | Requis | Ce qu'il fait                         |
+| --------------- | ---------------------------------- | ------ | ------------------------------------- |
+| `ingredients`   | tableau de 1 à 200 chaînes         | oui    | Les lignes à mettre à l'échelle.      |
+| `factor`        | nombre, supérieur à 0 jusqu'à 1000 | l'un   | Ce par quoi multiplier les quantités. |
+| `from_servings` | entier, 1 à 1000                   | l'un   | Pour combien la liste a été écrite.   |
+| `to_servings`   | entier, 1 à 1000                   | l'un   | Pour combien elle doit servir.        |
 
 Donner `factor`, ou `from_servings` et `to_servings` ensemble. Nommer les deux
 manières à la fois est refusé, parce qu'elles peuvent demander deux choses
@@ -528,28 +507,6 @@ qu'une cuisine mesure, `unscaled` quand la ligne ne porte aucune quantité.
 `scaled_count`, `rounded_count` et `unscaled_count`. Rien n'est converti d'un
 système d'unités à un autre, et une mesure approximative comme une `pizca` garde
 la taille que lui donne le cuisinier.
-
-## Ce que le site publie, et ce qu'il ne publie pas
-
-La section des recettes sert deux choses différentes à la même sorte d'adresse,
-et décrit les deux avec le même type structuré. Environ un tiers de ses recettes
-portent leurs ingrédients dans ce bloc ; la plupart les gardent dans le corps de
-l'article ; et à peu près une page sur sept est un article qui rassemble d'autres
-recettes. `kind` et `source_shape` disent laquelle des trois est revenue.
-
-Le site ne publie aucun compte, ni de ce qu'une recherche a trouvé, ni de ce
-qu'une taxonomie contient. `total_available` vaut donc `null` dans chaque
-réponse, et `has_more` dit si une autre page suit.
-
-Une page de recette n'énonce aucune taxonomie qui lui soit propre. Les liens de
-taxonomie imprimés autour d'elle appartiennent à la navigation du site et sont
-identiques sur chaque page, donc une recette revient avec les libellés de rubrique
-que porte son propre bloc et rien de plus. Le slug par lequel une facette se
-parcourt est publié sur la liste de cette facette.
-
-Le site écrit les ustensiles parmi les ingrédients, donc une ligne qui dit
-`Freidora de aire` arrive dans la même liste que le poulet. Une telle ligne est
-marquée et rendue telle que publiée, quelle que soit l'échelle demandée.
 
 ## Configuration
 
@@ -610,7 +567,7 @@ cache plutôt que du site.
 
 Une requête à la fois, trois secondes d'écart, et l'intervalle s'élargit quand le
 site demande de la place. Le User-Agent porte le nom du projet, sa version et une
-adresse où joindre une personne à propos d'un trafic que le site n'attendait pas.
+adresse où joindre une personne.
 
 Pequerecetas se lit gratuitement et paie son hébergement. Quand on montre une
 recette à quelqu'un, on crédite le site et on lie la page d'où elle vient.

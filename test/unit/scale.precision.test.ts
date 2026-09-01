@@ -66,3 +66,23 @@ describe("offal, which a knife halves rather than quarters", () => {
     expect(scaleLine("3 hígados de pollo", by(62.5))).toMatchObject({ amount: 187.5 });
   });
 });
+
+describe("what a note about rounding has to show", () => {
+  it("writes the figure it started from with enough digits to differ", () => {
+    const scaled = scaleLine("250 g de arroz", by(62.5));
+    expect(scaled.text).toBe("15,63 kg de arroz");
+    expect(scaled.note).toBe("Rounded up from 15,625.");
+  });
+
+  it("keeps the ordinary wording where two decimals already tell them apart", () => {
+    expect(scaleLine("25 g de aceite", by(0.25)).note).toBe("Rounded down from 6,25.");
+  });
+
+  it("never says a figure was rounded from itself", () => {
+    for (const factor of [0.25, 3, 38.75, 62.5, 250]) {
+      const note = scaleLine("250 g de arroz", by(factor)).note ?? "";
+      const shown = scaleLine("250 g de arroz", by(factor)).text.split(" ")[0];
+      expect(note).not.toContain(`from ${shown}.`);
+    }
+  });
+});
