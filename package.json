@@ -1,6 +1,6 @@
 {
   "name": "mcp-pequerecetas",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "MCP server for Pequerecetas. Read Spanish family recipes, rescale them, and browse by diet, ingredient, technique or age.",
   "keywords": [
     "mcp",

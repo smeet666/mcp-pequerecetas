@@ -25,6 +25,7 @@ import {
   formatUnit,
   spanishPlural,
   spanishSingular,
+  hasAddedQuantity,
   hasEmbeddedMeasure,
   isSpoonMeasure,
   QUARTERED_MEASURE,
@@ -837,7 +838,7 @@ function notesForReading(parsed: ParsedIngredient, amount: number): string[] {
     );
   }
 
-  if (hasEmbeddedMeasure(parsed.item)) {
+  if (hasEmbeddedMeasure(parsed.item) || hasAddedQuantity(parsed.item)) {
     notes.push(FURTHER_QUANTITY_NOTE);
   }
 
