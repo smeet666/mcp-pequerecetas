@@ -27,6 +27,7 @@ import {
   spanishSingular,
   hasEmbeddedMeasure,
   isSpoonMeasure,
+  promoteRounded,
   QUARTERED_MEASURE,
   unitDivisibility,
 } from "./units.js";
@@ -333,7 +334,11 @@ function scaleMeasure(
 
   if (unit !== null && unit.kind === "measured") {
     const chosen = chooseReadableUnit(unit, reference);
-    return inUnit(chosen.unit, chosen.ratio);
+    const measured = inUnit(chosen.unit, chosen.ratio);
+    // Asked again on the figure as it will be written, because rounding can
+    // bring a mass up to a round number of the unit above.
+    const promoted = promoteRounded(chosen.unit, measured.bounds[0].amount);
+    return promoted === null ? measured : inUnit(promoted.unit, chosen.ratio * promoted.ratio);
   }
 
   if (unit !== null && isSpoonMeasure(unit)) {
