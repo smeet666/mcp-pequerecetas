@@ -626,13 +626,20 @@ export function chooseReadableUnit(unit: UnitInfo, amount: number): ChosenUnit {
     current = step.unit;
   }
 
+  // The climb asks only that a full unit above has been reached. A figure that
+  // unit cannot state to the gram is still the better reading at that size:
+  // 15625 g claims a precision on fifteen kilos of rice that no kitchen holds,
+  // and what is dropped by writing 15,63 kg is said by the line's own scaling.
   const up = PROMOTIONS[normalizeUnitKey(current.canonical)];
-  if (up !== undefined && amount * ratio >= up.per && writesExactly((amount * ratio) / up.per)) {
+  if (up !== undefined && amount * ratio >= up.per) {
     const target = lookupUnit(up.to);
     /* v8 ignore next -- every ladder names a unit the vocabulary holds. */
     if (target !== null) {
-      ratio /= up.per;
-      current = target;
+      // The climb is final. What the bigger unit cannot state to the gram is
+      // rounded there and reported, which costs less than writing fifteen
+      // kilos of rice as a five-figure number of grams. Walking back down here
+      // would undo the climb for every figure that is not round.
+      return { unit: target, ratio: ratio / up.per };
     }
   }
 
@@ -651,28 +658,6 @@ export function chooseReadableUnit(unit: UnitInfo, amount: number): ChosenUnit {
   }
 
   return { unit: current, ratio };
-}
-
-/**
- * The unit above, when the figure as it will be written fits it exactly.
- *
- * `chooseReadableUnit` judges on the exact product, and what a reader sees is
- * that product rounded to what a scale shows. The two can disagree: 9687,5 g
- * does not fit kilos, and the 9690 g it rounds to is 9,69 kg to the gram. Asked
- * again once the figure is settled, this puts the two masses of one recipe in
- * the same unit instead of leaving one in grams beside another in kilos.
- */
-export function promoteRounded(unit: UnitInfo, amount: number): ChosenUnit | null {
-  const up = PROMOTIONS[normalizeUnitKey(unit.canonical)];
-  if (up === undefined || !Number.isFinite(amount) || amount < up.per) {
-    return null;
-  }
-  if (!writesExactly(amount / up.per)) {
-    return null;
-  }
-  const target = lookupUnit(up.to);
-  /* v8 ignore next -- every ladder names a unit the vocabulary holds. */
-  return target === null ? null : { unit: target, ratio: 1 / up.per };
 }
 
 /** At and above this, rounding costs less than restating the value further down. */

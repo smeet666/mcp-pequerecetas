@@ -224,8 +224,8 @@ describe("chooseReadableUnit", () => {
     expect(0.002 * chosen.ratio).toBe(2);
   });
 
-  it("keeps a figure the larger unit could not state where the page wrote it", () => {
-    expect(chooseReadableUnit(lookupUnit("g")!, 2468).unit.canonical).toBe("g");
+  it("climbs even where the larger unit cannot state the figure exactly", () => {
+    expect(chooseReadableUnit(lookupUnit("g")!, 2468).unit.canonical).toBe("kg");
   });
 
   it("leaves a counted thing in the unit the page wrote", () => {

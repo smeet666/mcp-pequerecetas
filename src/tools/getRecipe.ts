@@ -26,7 +26,14 @@ export const getRecipeDescription =
   "number of servings comes back unscaled and says so. A line naming a tool rather than an " +
   "ingredient is marked and never multiplied.";
 
-const MAX_SERVINGS = 200;
+/**
+ * The largest number of servings this server will take.
+ *
+ * The same figure bounds scale_ingredients, so one question gets one answer
+ * whichever tool is asked: a count this tool refuses is not one the other
+ * quietly accepts.
+ */
+const MAX_SERVINGS = 1000;
 
 export const getRecipeInput = {
   id: z
@@ -41,7 +48,9 @@ export const getRecipeInput = {
     .positive()
     .max(MAX_SERVINGS)
     .optional()
-    .describe("Rescale the quantities to this many. Left out, the recipe comes back as published."),
+    .describe(
+      `Rescale the quantities to this many, up to ${MAX_SERVINGS}. Left out, the recipe comes back as published.`,
+    ),
 } as const;
 
 export const getRecipeArgs = strictInput(getRecipeInput);

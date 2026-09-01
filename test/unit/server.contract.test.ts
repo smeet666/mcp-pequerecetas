@@ -242,3 +242,33 @@ describe("every tool answers through the protocol", () => {
     expect((await call).isError).toBe(true);
   });
 });
+
+describe("the bounds two tools put on the same question", () => {
+  /** The largest number of servings each tool will take, from its own schema. */
+  async function servingBounds(): Promise<Record<string, number | undefined>> {
+    const client = await connected();
+    const { tools } = await client.listTools();
+    const read = (tool: string, argument: string): number | undefined => {
+      const schema = tools.find((candidate) => candidate.name === tool)?.inputSchema;
+      const properties = (schema?.properties ?? {}) as Record<string, { maximum?: number }>;
+      return properties[argument]?.maximum;
+    };
+    return {
+      recipe: read("get_recipe", "servings"),
+      from: read("scale_ingredients", "from_servings"),
+      to: read("scale_ingredients", "to_servings"),
+      factor: read("scale_ingredients", "factor"),
+    };
+  }
+
+  it("asks the same of a number of servings, whichever tool is asked", async () => {
+    const bounds = await servingBounds();
+    expect(bounds["recipe"]).toBe(bounds["to"]);
+    expect(bounds["from"]).toBe(bounds["to"]);
+  });
+
+  it("lets a factor reach as far as two servings counts can ask for", async () => {
+    const bounds = await servingBounds();
+    expect(bounds["factor"]).toBe(bounds["to"]);
+  });
+});
