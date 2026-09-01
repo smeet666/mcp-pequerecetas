@@ -796,8 +796,30 @@ function noteForBound(bound: ScaledBound): string | null {
   if (boundLandedExactly(bound)) {
     return null;
   }
-  const direction = bound.amount > bound.raw * bound.ratio ? "up" : "down";
-  return `Rounded ${direction} from ${formatAmount(bound.raw * bound.ratio, { fractions: false })}.`;
+  const exact = bound.raw * bound.ratio;
+  const direction = bound.amount > exact ? "up" : "down";
+  return `Rounded ${direction} from ${startingFigure(exact)}.`;
+}
+
+/**
+ * The figure a line started from, written so it differs from the one it landed
+ * on.
+ *
+ * A line writes two decimals, and a mass that climbed a ladder can start closer
+ * than that: 15,625 kg lands on 15,63 kg, and a note saying it was rounded from
+ * 15,63 says nothing at all. Digits are added until the two read apart, up to
+ * where a kitchen has long stopped caring.
+ */
+function startingFigure(exact: number): string {
+  const shown = Math.round(exact * 100) / 100;
+  for (const digits of [3, 4, 5]) {
+    const step = 10 ** digits;
+    const closer = Math.round(exact * step) / step;
+    if (closer !== shown) {
+      return String(closer).replace(".", ",");
+    }
+  }
+  return formatAmount(exact, { fractions: false });
 }
 
 /** What the reading of the line itself has to say, beside the arithmetic. */
