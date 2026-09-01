@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { settle } from "../support/settle.js";
 import { loadConfig } from "../../src/config.js";
 import { createLogger } from "../../src/config.js";
 import type { PequerecetasError } from "../../src/errors.js";
@@ -47,12 +48,6 @@ afterEach(() => {
 });
 
 /** Run a read to completion, letting the spacing between requests elapse. */
-async function settle<T>(promise: Promise<T>): Promise<T> {
-  const result = promise;
-  await vi.runAllTimersAsync();
-  return await result;
-}
-
 describe("getRecipe", () => {
   it("reads a recipe and says it came fresh", async () => {
     const { client: pequerecetas } = client([{ body: load("recipe-structured.html") }]);
