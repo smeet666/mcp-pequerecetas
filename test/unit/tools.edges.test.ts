@@ -119,6 +119,27 @@ describe("search_recipes at its edges", () => {
     expect(text(result)).toMatch(/\[invalid_input]/);
   });
 
+  it("stops claiming these are all the rows once a limit has cut them", async () => {
+    const result = await settle(
+      runSearchRecipes(client([{ body: load("search-results.html") }]), {
+        query: "arroz",
+        limit: 1,
+      }),
+    );
+    const notes = (structured(result.structuredContent)["notes"] as string[]).join(" ");
+    expect(notes).not.toMatch(/all the rows/);
+    expect(notes).toMatch(/one page/);
+  });
+
+  it("says the rows come in the site's own order rather than by relevance", async () => {
+    const result = await settle(
+      runSearchRecipes(client([{ body: load("search-results.html") }]), { query: "arroz" }),
+    );
+    expect((structured(result.structuredContent)["notes"] as string[]).join(" ")).toMatch(
+      /order the site serves them in/,
+    );
+  });
+
   it("says rows were left out when more were served than were asked for", async () => {
     const result = await settle(
       runSearchRecipes(client([{ body: load("search-results.html") }]), {

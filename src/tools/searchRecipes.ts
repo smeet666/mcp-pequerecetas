@@ -17,8 +17,9 @@ import { ok, type ToolResult, toToolError } from "./shared.js";
 export const searchRecipesDescription =
   "Search Pequerecetas for a dish or an ingredient, in Spanish. The site serves its search on one " +
   "page and offers no second page, so 'result_count' counts the rows served and 'total_available' " +
-  "is null: the site publishes no count of what a search matched. A row carries the slug that " +
-  "get_recipe takes. Some rows are articles gathering recipes rather than recipes, which get_recipe " +
+  "is null: the site publishes no count of what a search matched. The rows come in the site's own " +
+  "order, which is not by how well they match, so a dish named in the query can sit well down the " +
+  "page and 'limit' cuts in that order. A row carries the slug that get_recipe takes. Some rows are articles gathering recipes rather than recipes, which get_recipe " +
   "reports as a 'collection'. To narrow by diet, ingredient, technique or the age of the eater, use " +
   "list_facets and browse_recipes instead: this site's search takes no filters.";
 
@@ -61,9 +62,22 @@ export const searchRecipesOutputShape = {
   notes: z.array(z.string()),
 } as const;
 
-const ONE_PAGE_NOTE =
+const WHOLE_PAGE_NOTE =
   "This site serves its search on one page and answers a request for a second with the first again, so these are all the rows it offers for this query. It publishes no count of what the query matched.";
-const TRIMMED_NOTE = "More rows were served than were asked for, and the rest were left out.";
+const CUT_PAGE_NOTE =
+  "This site serves its search on one page and answers a request for a second with the first again. It publishes no count of what the query matched.";
+/**
+ * What a caller has to know before reading a shortened list as an absence.
+ *
+ * The site orders its results its own way, and a dish named in the query can
+ * come well down the page: a search for a Spanish omelette serves an unrelated
+ * chilli first. A limit cuts in that order, so the rows left out are not the
+ * least relevant ones.
+ */
+const TRIMMED_NOTE =
+  "More rows were served than were asked for, and the rest were left out. They were cut in the order above, which is the site's own, so a dish missing from these rows may still be further down the page: ask again without a limit before reading this as an absence.";
+const ORDER_NOTE =
+  "The rows are in the order the site serves them in, which is not by how well they match the query.";
 const NOTHING_NOTE =
   "The site matched nothing for this query. It searches the words of a page, so a dish spelled another way or named in another language may still be there.";
 
@@ -96,10 +110,11 @@ export async function runSearchRecipes(
     const served = read.data.rows;
     const rows = parsed.data.limit === undefined ? served : served.slice(0, parsed.data.limit);
 
-    const notes = [
-      ...(rows.length === 0 ? [NOTHING_NOTE] : [ONE_PAGE_NOTE]),
-      ...(rows.length < served.length ? [TRIMMED_NOTE] : []),
-    ];
+    const cut = rows.length < served.length;
+    const notes =
+      rows.length === 0
+        ? [NOTHING_NOTE]
+        : [cut ? CUT_PAGE_NOTE : WHOLE_PAGE_NOTE, ORDER_NOTE, ...(cut ? [TRIMMED_NOTE] : [])];
 
     return ok(
       {
