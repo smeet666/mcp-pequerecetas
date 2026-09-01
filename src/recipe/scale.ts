@@ -749,6 +749,14 @@ export function scaleLine(line: string, options: ScaleOptions): ScaledIngredient
   }
 
   if (options.factor === 1) {
+    // A line whose amount was read out of an article carries a figure the page
+    // never wrote, and it says so whether or not anything was multiplied: the
+    // reading is what has to be qualified, and the arithmetic changed nothing
+    // here.
+    const read =
+      parsed.articleWord === null
+        ? undefined
+        : `"${parsed.articleWord}" read as ${formatAmount(parsed.amount)}.`;
     return {
       text: original,
       original,
@@ -758,6 +766,7 @@ export function scaleLine(line: string, options: ScaleOptions): ScaledIngredient
       unit: parsed.unit === null ? null : parsed.unit.canonical,
       is_heading: false,
       is_equipment: false,
+      ...(read === undefined ? {} : { note: read }),
     };
   }
 

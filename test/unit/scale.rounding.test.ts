@@ -220,3 +220,23 @@ describe("a mass large enough for the unit above it", () => {
     expect(scaleLine("180 g de judías verdes", by(38.75)).unit).toBe("g");
   });
 });
+
+describe("a figure the page never wrote, at any factor", () => {
+  it("says where the number came from when nothing was scaled", () => {
+    const scaled = scaleLine("Unas hojas de menta fresca", by(1));
+    expect(scaled.amount).toBe(3);
+    expect(scaled.note).toMatch(/"Unas" read as 3/);
+  });
+
+  it("says it just the same when the line was scaled", () => {
+    expect(scaleLine("Unas hojas de menta fresca", by(2)).note).toMatch(/"Unas" read as 3/);
+  });
+
+  it("leaves a line whose figure the page did write unqualified", () => {
+    expect(scaleLine("400 g de arroz", by(1)).note).toBeUndefined();
+  });
+
+  it("keeps the words of the line exactly as published", () => {
+    expect(scaleLine("Unas hojas de menta fresca", by(1)).text).toBe("Unas hojas de menta fresca");
+  });
+});
