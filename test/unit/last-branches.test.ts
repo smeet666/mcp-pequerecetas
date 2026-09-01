@@ -8,6 +8,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { settle } from "../support/settle.js";
 import { createLogger, loadConfig } from "../../src/config.js";
 import { PequerecetasClient } from "../../src/pequerecetas/client.js";
 import { parseListing } from "../../src/pequerecetas/parseListing.js";
@@ -148,9 +149,7 @@ describe("what a rendering leaves out when the page published nothing", () => {
       logger: createLogger("silent"),
       fetchImpl: (async () => new Response(html, { status: 200 })) as unknown as typeof fetch,
     });
-    const call = runGetRecipe(client, { id: "escueta" });
-    await vi.runAllTimersAsync();
-    const result = await call;
+    const result = await settle(runGetRecipe(client, { id: "escueta" }));
     expect(result.content[0]?.text).toMatch(/Escueta\n\nIngredientes:/);
   });
 
@@ -166,9 +165,7 @@ describe("what a rendering leaves out when the page published nothing", () => {
       logger: createLogger("silent"),
       fetchImpl: (async () => new Response(html, { status: 200 })) as unknown as typeof fetch,
     });
-    const call = runGetRecipe(client, { id: "coleccion-escueta" });
-    await vi.runAllTimersAsync();
-    const result = await call;
+    const result = await settle(runGetRecipe(client, { id: "coleccion-escueta" }));
     expect(result.content[0]?.text).toMatch(/Colección escueta\n\nThis page gathers/);
   });
 });
@@ -201,9 +198,8 @@ describe("a client left to the runtime's own fetch", () => {
       config: loadConfig({}),
       logger: createLogger("silent"),
     });
-    const read = client.listFacets("dieta");
-    await vi.runAllTimersAsync();
-    expect((await read).data[0]?.values).toEqual([]);
+    const read = await settle(client.listFacets("dieta"));
+    expect(read.data[0]?.values).toEqual([]);
   });
 });
 
@@ -214,8 +210,8 @@ describe("a read that never answers", () => {
       logger: createLogger("silent"),
       fetchImpl: (() => Promise.reject(new Error("socket hung up"))) as unknown as typeof fetch,
     });
-    const read = client.searchRecipes("arroz");
-    await vi.runAllTimersAsync();
-    await expect(read).rejects.toMatchObject({ code: "network_error" });
+    await expect(settle(client.searchRecipes("arroz"))).rejects.toMatchObject({
+      code: "network_error",
+    });
   });
 });

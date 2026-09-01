@@ -10,6 +10,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { settle } from "../support/settle.js";
 import { createLogger, loadConfig } from "../../src/config.js";
 import { PequerecetasClient } from "../../src/pequerecetas/client.js";
 import { runBrowseRecipes } from "../../src/tools/browseRecipes.js";
@@ -39,12 +40,6 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
 });
-
-async function settle<T>(promise: Promise<T>): Promise<T> {
-  const result = promise;
-  await vi.runAllTimersAsync();
-  return await result;
-}
 
 const structured = (record: Record<string, unknown> | undefined) => record ?? {};
 const text = (result: { content: Array<{ text: string }> }) => result.content[0]?.text ?? "";
