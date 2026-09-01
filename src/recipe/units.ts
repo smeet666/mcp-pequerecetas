@@ -276,6 +276,21 @@ export function hasEmbeddedMeasure(text: string): boolean {
 }
 
 /**
+ * A second count the line adds to the first, carrying no measure of its own.
+ *
+ * A page writes "2 ramas de romero y otras 2 para decorar", and the second two
+ * is as much a quantity as the first even though no unit follows it. Only a
+ * figure a word of addition introduces is read this way: a number standing on
+ * its own belongs to the name of the thing, as in "harina 000", and reading it
+ * as a quantity would qualify a line nothing is wrong with.
+ */
+const ADDED_QUANTITY = /\b(?:y|e|mas|ademas|otro|otra|otros|otras)\s+(?:otr[ao]s?\s+)?\d/i;
+
+export function hasAddedQuantity(text: string): boolean {
+  return ADDED_QUANTITY.test(normalizeUnitKey(text));
+}
+
+/**
  * Words that stand where a measure would and name no container.
  *
  * "un poco de sal" states that there is some salt, and multiplying it says

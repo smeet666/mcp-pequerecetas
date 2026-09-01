@@ -250,3 +250,33 @@ describe("a figure the page never wrote, at any factor", () => {
     expect(scaleLine("Unas hojas de menta fresca", by(1)).text).toBe("Unas hojas de menta fresca");
   });
 });
+
+describe("a line the page wrote two quantities into", () => {
+  it("says the second one reads as published, where it is a bare count", () => {
+    const scaled = scaleLine("2 ramas de romero y otras 2 para decorar", by(10));
+    expect(scaled.text).toBe("20 ramas de romero y otras 2 para decorar");
+    expect(scaled.note).toMatch(/further quantity/);
+  });
+
+  it("says it for a second count joined by nothing but an and", () => {
+    expect(scaleLine("6 limas y 4 limones", by(3)).note).toMatch(/further quantity/);
+  });
+
+  it("says it too where the second quantity carries a measure", () => {
+    expect(scaleLine("1 cucharada de azúcar o 2 cucharaditas de miel", by(2)).note).toMatch(
+      /further quantity/,
+    );
+  });
+
+  it("leaves a line whose second figure belongs to the name of the thing", () => {
+    expect(scaleLine("200 g de harina 000", by(2)).note).toBeUndefined();
+  });
+
+  it("leaves a line whose figure is part of a name", () => {
+    expect(scaleLine("200 g de chocolate 70% cacao", by(2)).note).toBeUndefined();
+  });
+
+  it("leaves an ordinary line alone", () => {
+    expect(scaleLine("2 cebollas medianas", by(3)).note).toBeUndefined();
+  });
+});
