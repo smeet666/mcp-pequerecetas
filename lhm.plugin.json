@@ -1,0 +1,808 @@
+{
+  "author": "Damien Bouissou",
+  "authorUrl": "https://github.com/smeet666",
+  "description": "MCP server for Pequerecetas. Read Spanish family recipes, rescale them, and browse by diet, ingredient, technique or age.",
+  "homepage": "https://github.com/smeet666/mcp-pequerecetas#readme",
+  "identifier": "smeet666-mcp-pequerecetas",
+  "name": "mcp-pequerecetas",
+  "prompts": [],
+  "resources": [],
+  "tags": [
+    "mcp",
+    "model-context-protocol",
+    "pequerecetas",
+    "recipes",
+    "cooking",
+    "spanish-recipes"
+  ],
+  "tools": [
+    {
+      "name": "get_recipe",
+      "title": "Read one recipe",
+      "description": "Read one page of the recipe section by the slug in its address, such as 'paella-de-marisco'. 'kind' says what the page turned out to be: a 'recipe', or a 'collection', which is an article gathering other recipes and carries no ingredients of its own. A recipe says under 'source_shape' where its ingredients were read: 'structured' from the block the page publishes for search engines, 'article' from the body of the page, which is where most of this site's recipes keep them. Pass 'servings' to rescale the quantities; a recipe whose page states no number of servings comes back unscaled and says so. A line naming a tool rather than an ingredient is marked and never multiplied.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "The slug in a recipe's address, from search_recipes or browse_recipes."
+          },
+          "servings": {
+            "description": "Rescale the quantities to this many, up to 1000. Left out, the recipe comes back as published.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 1000
+          }
+        },
+        "required": ["id"],
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["recipe", "collection"]
+          },
+          "recipe": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "description": {
+                "type": ["string", "null"]
+              },
+              "published_at": {
+                "type": ["string", "null"]
+              },
+              "modified_at": {
+                "type": ["string", "null"]
+              },
+              "source_shape": {
+                "type": "string",
+                "enum": ["structured", "article"]
+              },
+              "yield": {
+                "type": "object",
+                "properties": {
+                  "original_count": {
+                    "type": ["number", "null"]
+                  },
+                  "original_text": {
+                    "type": ["string", "null"]
+                  },
+                  "requested": {
+                    "type": ["number", "null"]
+                  },
+                  "unit": {
+                    "type": ["string", "null"]
+                  },
+                  "factor": {
+                    "type": "number"
+                  }
+                },
+                "required": ["original_count", "original_text", "requested", "unit", "factor"],
+                "additionalProperties": false
+              },
+              "ingredients": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "original": {
+                      "type": "string"
+                    },
+                    "scaling": {
+                      "type": "string",
+                      "enum": ["scaled", "rounded", "unscaled"]
+                    },
+                    "amount": {
+                      "type": ["number", "null"]
+                    },
+                    "amount_max": {
+                      "type": ["number", "null"]
+                    },
+                    "unit": {
+                      "type": ["string", "null"]
+                    },
+                    "is_heading": {
+                      "type": "boolean"
+                    },
+                    "is_equipment": {
+                      "type": "boolean",
+                      "description": "True for a line naming a tool rather than something eaten."
+                    },
+                    "note": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "original",
+                    "scaling",
+                    "amount",
+                    "amount_max",
+                    "unit",
+                    "is_heading",
+                    "is_equipment"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "group": {
+                      "description": "The page's own heading for the group this step is under.",
+                      "type": ["string", "null"]
+                    },
+                    "url": {
+                      "type": ["string", "null"]
+                    },
+                    "image": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["text", "group", "url", "image"],
+                  "additionalProperties": false
+                }
+              },
+              "prep_minutes": {
+                "type": ["number", "null"]
+              },
+              "cook_minutes": {
+                "type": ["number", "null"]
+              },
+              "total_minutes": {
+                "type": ["number", "null"]
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "cuisines": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "keywords": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "author": {
+                "type": ["string", "null"]
+              },
+              "author_url": {
+                "type": ["string", "null"]
+              },
+              "rating": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "number"
+                      },
+                      "count": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "scale": {
+                        "type": "number",
+                        "description": "The top of the scale, as published."
+                      },
+                      "worst": {
+                        "type": "number"
+                      }
+                    },
+                    "required": ["value", "count", "scale", "worst"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "nutrition": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "text": {
+                        "type": "string"
+                      },
+                      "calories": {
+                        "type": ["number", "null"]
+                      }
+                    },
+                    "required": ["text", "calories"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "images": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "url",
+              "description",
+              "published_at",
+              "modified_at",
+              "source_shape",
+              "yield",
+              "ingredients",
+              "steps",
+              "prep_minutes",
+              "cook_minutes",
+              "total_minutes",
+              "categories",
+              "cuisines",
+              "keywords",
+              "author",
+              "author_url",
+              "rating",
+              "nutrition",
+              "images"
+            ],
+            "additionalProperties": false
+          },
+          "collection": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "description": {
+                "type": ["string", "null"]
+              },
+              "published_at": {
+                "type": ["string", "null"]
+              },
+              "modified_at": {
+                "type": ["string", "null"]
+              },
+              "headings": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "recipes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "image_url": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["id", "title", "url", "image_url"],
+                  "additionalProperties": false
+                }
+              },
+              "images": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "url",
+              "description",
+              "published_at",
+              "modified_at",
+              "headings",
+              "recipes",
+              "images"
+            ],
+            "additionalProperties": false
+          },
+          "cached": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["kind", "cached", "notes"],
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "search_recipes",
+      "title": "Search the recipes",
+      "description": "Search Pequerecetas for a dish or an ingredient, in Spanish. The site serves its search on one page and offers no second page, so 'result_count' counts the rows served and 'total_available' is null: the site publishes no count of what a search matched. The rows come in the site's own order, which is not by how well they match, so a dish named in the query can sit well down the page and 'limit' cuts in that order. A row carries the slug that get_recipe takes. Some rows are articles gathering recipes rather than recipes, which get_recipe reports as a 'collection'. To narrow by diet, ingredient, technique or the age of the eater, use list_facets and browse_recipes instead: this site's search takes no filters.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "description": "What to search for, in Spanish: a dish, an ingredient, a technique."
+          },
+          "limit": {
+            "description": "Rows to return, at most 60. Left out, every row served comes back.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 60
+          }
+        },
+        "required": ["query"],
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "The slug get_recipe takes."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "image_url": {
+                  "type": ["string", "null"]
+                }
+              },
+              "required": ["id", "title", "url", "image_url"],
+              "additionalProperties": false
+            }
+          },
+          "result_count": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "description": "Rows returned."
+          },
+          "total_available": {
+            "type": "null",
+            "description": "Always null: the site publishes no count of what a search matched."
+          },
+          "cached": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["query", "results", "result_count", "total_available", "cached", "notes"],
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "list_facets",
+      "title": "List the taxonomies recipes are browsed by",
+      "description": "List the values the site browses its recipes by. The taxonomies are dieta, edad, ingrediente, ocasion, recetas-de, tecnica, tipo-de-cocina, tipo-plato: diet, the age of whoever eats it, main ingredient, occasion, moment of the day, appliance, cuisine and kind of dish. Call this before browse_recipes rather than spelling a value yourself. Pass 'facet' for one taxonomy, or leave it out for all eight, which costs one request per taxonomy.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "facet": {
+            "description": "One taxonomy: dieta, edad, ingrediente, ocasion, recetas-de, tecnica, tipo-de-cocina, tipo-plato. All eight when left out.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "facets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The taxonomy, as browse_recipes takes it."
+                },
+                "value_count": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991,
+                  "description": "Values this taxonomy publishes."
+                },
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "description": "The slug browse_recipes takes."
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["value", "url"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["name", "value_count", "values"],
+              "additionalProperties": false
+            }
+          },
+          "cached": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["facets", "cached", "notes"],
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "browse_recipes",
+      "title": "Read one taxonomy's recipes",
+      "description": "Browse the recipes a taxonomy holds, one page at a time. 'facet' is one of dieta, edad, ingrediente, ocasion, recetas-de, tecnica, tipo-de-cocina, tipo-plato, and 'value' is a slug from list_facets: the site writes its own slugs and answers one built by hand with a page it does not hold. Read 'page_served' rather than assuming the page asked for, and 'has_more' to know whether the site offers another. 'total_available' is null because the site prints no count on these pages. The taxonomies cannot be combined: this site offers no way to ask for two at once.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "facet": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The taxonomy to browse: dieta, edad, ingrediente, ocasion, recetas-de, tecnica, tipo-de-cocina, tipo-plato."
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "description": "A slug from list_facets, such as 'thermomix'."
+          },
+          "page": {
+            "description": "Which page to read. The first when left out.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 200
+          }
+        },
+        "required": ["facet", "value"],
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "facet": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "page_served": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "description": "The page the site actually served."
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "The slug get_recipe takes."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "image_url": {
+                  "type": ["string", "null"]
+                }
+              },
+              "required": ["id", "title", "url", "image_url"],
+              "additionalProperties": false
+            }
+          },
+          "result_count": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether the site's own pagination offers a page after this one."
+          },
+          "total_available": {
+            "type": "null",
+            "description": "Always null: the site prints no count on these pages."
+          },
+          "cached": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "facet",
+          "value",
+          "page_served",
+          "results",
+          "result_count",
+          "has_more",
+          "total_available",
+          "cached",
+          "notes"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "scale_ingredients",
+      "title": "Rescale a list of ingredients",
+      "description": "Rescale a list of Spanish ingredient lines, offline. Give either 'factor', or 'from_servings' and 'to_servings' together. Each line comes back with what was done to it: 'scaled' when the arithmetic landed exactly, 'rounded' when the value had to move to stay something a kitchen can measure out, and 'unscaled' when the line carries no quantity at all. Nothing is converted between unit systems, and an approximate measure such as a pizca keeps its own size. A line naming a tool rather than an ingredient is marked 'is_equipment' and left as it was given.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ingredients": {
+            "minItems": 1,
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            },
+            "description": "The lines to rescale, as the recipe wrote them."
+          },
+          "factor": {
+            "description": "What to multiply the quantities by. Give this, or the two servings counts.",
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1000
+          },
+          "from_servings": {
+            "description": "How many the list was written for.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 1000
+          },
+          "to_servings": {
+            "description": "How many it should serve.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 1000
+          }
+        },
+        "required": ["ingredients"],
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "factor": {
+            "type": "number",
+            "description": "What the quantities were multiplied by."
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "The line as it now reads."
+                },
+                "original": {
+                  "type": "string",
+                  "description": "The line as it was given."
+                },
+                "scaling": {
+                  "type": "string",
+                  "enum": ["scaled", "rounded", "unscaled"],
+                  "description": "'scaled' when the number is the product itself, 'rounded' when the value moved or a floor was reached, 'unscaled' when the line carries nothing multipliable."
+                },
+                "amount": {
+                  "description": "The scaled quantity, read together with 'unit'.",
+                  "type": ["number", "null"]
+                },
+                "amount_max": {
+                  "description": "Upper bound when the line gives a range.",
+                  "type": ["number", "null"]
+                },
+                "unit": {
+                  "description": "The unit 'amount' is in, which may differ from the original.",
+                  "type": ["string", "null"]
+                },
+                "is_heading": {
+                  "type": "boolean",
+                  "description": "True for a line naming a part of the recipe rather than an ingredient."
+                },
+                "is_equipment": {
+                  "type": "boolean",
+                  "description": "True for a line naming a tool rather than something eaten. The site writes equipment among its ingredients, and a tool is carried as published however many people the recipe is scaled to."
+                },
+                "note": {
+                  "description": "Why the line was rounded, clamped or left alone.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "original",
+                "scaling",
+                "amount",
+                "amount_max",
+                "unit",
+                "is_heading",
+                "is_equipment"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "scaled_count": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "description": "Lines whose arithmetic landed exactly."
+          },
+          "rounded_count": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "description": "Lines whose value had to move."
+          },
+          "unscaled_count": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "description": "Lines carrying no quantity."
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "factor",
+          "ingredients",
+          "scaled_count",
+          "rounded_count",
+          "unscaled_count",
+          "notes"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    }
+  ],
+  "version": "1.0.0"
+}
