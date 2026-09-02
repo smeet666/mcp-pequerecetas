@@ -1,97 +1,167 @@
 # Privacy
 
-`mcp-pequerecetas` collects nothing about you.
+This server collects nothing about you, and sends nothing to its author.
 
-## What it does
-
-The server runs on your machine, over stdio, started by your MCP client. When a
-tool is called it makes an HTTPS request to `www.pequerecetas.com` and reads the
-page that comes back. That is the whole of what it does on a network.
-
-## What it sends
-
-Each request carries a `User-Agent` naming this project, its version and the
-address of its repository, so the site can reach a person about traffic it did
-not expect. Setting `PQR_USER_AGENT` prefixes your own identifier to that line,
-and the project's own identifier stays appended.
-
-The words you search for travel to the site, because that is what a search is.
-Nothing else about you is sent: no identifier, no account, no key. The site asks
-for none, and the server holds none.
-
-## What it keeps
-
-Answers are held in memory, in a bounded store, for fifteen minutes by default.
-`PQR_CACHE_TTL_MS` changes that lifetime and `0` turns the store off;
-`PQR_CACHE_MAX_ENTRIES` bounds how many answers it holds. The store lives in the
-process and goes when the process goes.
-
-Nothing is written to disk. The server has no log file, no database and no
-temporary file.
-
-## What it prints
-
-Diagnostics go to stderr, at the level `PQR_LOG_LEVEL` sets, which is `error` by
-default. Nothing is written to stdout, because stdout carries the protocol.
-
-## Third parties
-
-The only host contacted is `www.pequerecetas.com`. No analytics, no telemetry,
-no error reporting service. Reading a page means the site sees a request from
-your network, as it would if you opened the page in a browser.
-
-## Questions
-
-Open an issue at
-[github.com/smeet666/mcp-pequerecetas/issues](https://github.com/smeet666/mcp-pequerecetas/issues).
+_[Version française](#confidentialité)_
 
 ---
 
+## What this server is
+
+`mcp-pequerecetas` is a read-only client for
+[Pequerecetas](https://www.pequerecetas.com). It runs on your own machine, as a
+process your MCP host starts, and it speaks over stdio. It listens on no port.
+
+It needs no API key and no account, so there is no credential for it to hold and
+none for it to send.
+
+## What leaves your machine, and where it goes
+
+**One host is contacted: `www.pequerecetas.com`.** Nothing else.
+
+| Host                   | What is read there |
+| ---------------------- | ------------------ |
+| `www.pequerecetas.com` | the site's pages   |
+
+What a request carries:
+
+| What                   | Why it is there                                                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| The question you asked | A search term or a slug reaches the site as you wrote it.                                                                                   |
+| A `User-Agent`         | `mcp-pequerecetas/<version> (+https://github.com/smeet666/mcp-pequerecetas)`, so the site can reach a person about the traffic it receives. |
+| Your IP address        | Sent by your network to any host you contact, as with any web request.                                                                      |
+
+Your requests reach Pequerecetas. What is done with them there is governed by
+that site's own practices, which this project does not control.
+
+## What is kept, and for how long
+
+**Answers are held in memory only, and only while the server runs.** The cache is
+a table in the process: it holds what was read so that reading the same page
+twice costs one request instead of two. It holds at most two hundred pages for
+fifteen minutes each by default, and closing the server empties it.
+
+**Nothing is written to disk.** The server creates no file, no database and no
+log file.
+
+## What is never collected
+
+- No analytics, no telemetry, no usage counter.
+- Nothing is sent to the author of this project or to any third party.
+- No account, no profile, no identifier is created for you.
+- Your questions are not stored, forwarded, or used to train anything.
+
+## Logs
+
+The server writes diagnostics to **stderr**, where your MCP host decides what
+becomes of them. `PQR_LOG_LEVEL` governs how much is written and defaults to
+`error`. At `debug` the addresses fetched are written too. These lines stay on
+your machine.
+
+## The settings that change any of this
+
+| Variable           | What it changes                                                                                                  |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `PQR_USER_AGENT`   | Adds your own identifier in front of this project's, which stays appended so the site can always reach a person. |
+| `PQR_CACHE_TTL_MS` | How long an answer is held in memory. `0` turns the cache off.                                                   |
+| `PQR_LOG_LEVEL`    | How much is written to stderr.                                                                                   |
+
+## Children
+
+This server is a tool for developers and it is not directed at children.
+
+## Changes
+
+A change to this policy travels in a release, and the changelog names it.
+
+## Contact
+
+Open an issue on
+[the repository](https://github.com/smeet666/mcp-pequerecetas/issues). For
+something exploitable, follow [SECURITY.md](./SECURITY.md) instead.
+
+---
+
+<a name="confidentialité"></a>
+
 # Confidentialité
 
-`mcp-pequerecetas` ne collecte rien sur vous.
+Ce serveur ne collecte rien sur vous, et n'envoie rien à son auteur.
 
-## Ce qu'il fait
+_[English version](#privacy)_
 
-Le serveur tourne sur votre machine, en stdio, lancé par votre client MCP. Quand
-un outil est appelé, il fait une requête HTTPS vers `www.pequerecetas.com` et lit
-la page qui revient. C'est tout ce qu'il fait sur un réseau.
+## Ce qu'est ce serveur
 
-## Ce qu'il envoie
+`mcp-pequerecetas` est un client en lecture seule pour
+[Pequerecetas](https://www.pequerecetas.com). Il tourne sur votre machine, en
+tant que processus lancé par votre hôte MCP, et parle sur stdio. Il n'écoute sur
+aucun port.
 
-Chaque requête porte un `User-Agent` qui nomme ce projet, sa version et l'adresse
-de son dépôt, pour que le site puisse joindre une personne à propos d'un trafic
-qu'il n'attendait pas. Définir `PQR_USER_AGENT` préfixe votre propre identifiant
-à cette ligne, et l'identifiant du projet y reste ajouté.
+Il n'a besoin d'aucune clé d'API ni d'aucun compte, donc il ne détient aucun
+identifiant et n'en envoie aucun.
 
-Les mots que vous cherchez voyagent vers le site, puisque c'est ce qu'est une
-recherche. Rien d'autre vous concernant n'est envoyé : aucun identifiant, aucun
-compte, aucune clé. Le site n'en demande aucun, et le serveur n'en porte aucun.
+## Ce qui quitte votre machine, et où cela va
 
-## Ce qu'il garde
+**Un seul hôte est joint : `www.pequerecetas.com`.** Rien d'autre.
 
-Les réponses sont gardées en mémoire, dans un cache borné, quinze minutes par
-défaut. `PQR_CACHE_TTL_MS` change cette durée et `0` éteint le cache ;
-`PQR_CACHE_MAX_ENTRIES` borne le nombre de réponses gardées. Le cache vit dans le
-processus et disparaît avec lui.
+| Hôte                   | Ce qui y est lu   |
+| ---------------------- | ----------------- |
+| `www.pequerecetas.com` | les pages du site |
 
-Rien n'est écrit sur disque. Le serveur n'a ni fichier de journal, ni base de
-données, ni fichier temporaire.
+Ce que porte une requête :
 
-## Ce qu'il imprime
+| Quoi              | Pourquoi c'est là                                                                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| La question posée | Un terme de recherche ou un slug atteint le site tel que vous l'avez écrit.                                                                        |
+| Un `User-Agent`   | `mcp-pequerecetas/<version> (+https://github.com/smeet666/mcp-pequerecetas)`, pour que le site puisse joindre une personne au sujet de son trafic. |
+| Votre adresse IP  | Transmise par votre réseau à tout hôte que vous joignez, comme pour toute requête web.                                                             |
 
-Les diagnostics partent sur stderr, au niveau que fixe `PQR_LOG_LEVEL`, qui vaut
-`error` par défaut. Rien n'est écrit sur stdout, parce que stdout porte le
-protocole.
+Vos requêtes atteignent Pequerecetas. Ce qui en est fait là-bas relève des
+pratiques de ce site, que ce projet ne contrôle pas.
 
-## Tiers
+## Ce qui est conservé, et combien de temps
 
-Le seul hôte joint est `www.pequerecetas.com`. Aucune mesure d'audience, aucune
-télémétrie, aucun service de remontée d'erreurs. Lire une page signifie que le
-site voit une requête venant de votre réseau, comme si vous ouvriez la page dans
-un navigateur.
+**Les réponses ne sont gardées qu'en mémoire, et seulement pendant que le serveur
+tourne.** Le cache est une table dans le processus : il garde ce qui a été lu
+pour qu'une même page lue deux fois ne coûte qu'une requête. Il tient deux cents
+pages au plus, quinze minutes chacune par défaut, et fermer le serveur le vide.
 
-## Questions
+**Rien n'est écrit sur le disque.** Le serveur ne crée aucun fichier, aucune base
+et aucun journal.
 
-Ouvrir une issue sur
-[github.com/smeet666/mcp-pequerecetas/issues](https://github.com/smeet666/mcp-pequerecetas/issues).
+## Ce qui n'est jamais collecté
+
+- Aucune analyse d'audience, aucune télémétrie, aucun compteur d'usage.
+- Rien n'est envoyé à l'auteur de ce projet ni à un tiers.
+- Aucun compte, aucun profil, aucun identifiant n'est créé pour vous.
+- Vos questions ne sont ni stockées, ni transmises, ni utilisées pour entraîner
+  quoi que ce soit.
+
+## Les journaux
+
+Le serveur écrit ses diagnostics sur **stderr**, où votre hôte MCP décide de leur
+sort. `PQR_LOG_LEVEL` règle ce qui est écrit et vaut `error` par défaut. À
+`debug` les adresses jointes s'y ajoutent. Ces lignes restent sur votre machine.
+
+## Les réglages qui changent tout cela
+
+| Variable           | Ce qu'elle change                                                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `PQR_USER_AGENT`   | Place votre propre identifiant devant celui du projet, qui reste ajouté pour que le site puisse toujours joindre une personne. |
+| `PQR_CACHE_TTL_MS` | La durée pendant laquelle une réponse est gardée en mémoire. `0` éteint le cache.                                              |
+| `PQR_LOG_LEVEL`    | Ce qui est écrit sur stderr.                                                                                                   |
+
+## Les enfants
+
+Ce serveur est un outil pour développeurs et il ne s'adresse pas aux enfants.
+
+## Les évolutions
+
+Un changement de cette politique voyage dans une version, et le changelog le
+nomme.
+
+## Contact
+
+Ouvrez une issue sur
+[le dépôt](https://github.com/smeet666/mcp-pequerecetas/issues). Pour quelque
+chose d'exploitable, suivez [SECURITY.md](./SECURITY.md) à la place.
