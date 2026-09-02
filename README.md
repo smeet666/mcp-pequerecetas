@@ -7,6 +7,7 @@
 [![license](https://img.shields.io/npm/l/mcp-pequerecetas.svg)](./LICENSE)
 [![MCP Registry](https://img.shields.io/badge/MCP_Registry-listed-6E56CF)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.smeet666/mcp-pequerecetas)
 [![Glama](https://glama.ai/mcp/servers/smeet666/mcp-pequerecetas/badges/score.svg)](https://glama.ai/mcp/servers/smeet666/mcp-pequerecetas)
+[![LobeHub](https://lobehub.com/badge/mcp/smeet666-mcp-pequerecetas)](https://lobehub.com/mcp/smeet666-mcp-pequerecetas)
 [![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=pequerecetas&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIm1jcC1wZXF1ZXJlY2V0YXMiXX0=)
 [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install-0098FF?style=flat&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=pequerecetas&config=%7B%22name%22%3A%22pequerecetas%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22mcp-pequerecetas%22%5D%7D)
 
