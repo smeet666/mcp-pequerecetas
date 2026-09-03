@@ -263,3 +263,47 @@ describe("parseRecipePage, pages that cannot be read", () => {
     );
   });
 });
+
+/**
+ * The comment form the theme prints under an article.
+ *
+ * It sits inside the same container the article's own words are in, and it
+ * carries a heading and links of its own. Read past it, an article comes back
+ * built from a heading nobody wrote about the dish and pointing at whatever a
+ * reader linked underneath, and a recipe takes a step from a stranger.
+ */
+describe("what a reader wrote underneath", () => {
+  it("is no heading of the article", () => {
+    const page = collection();
+    const headings = page.kind === "collection" ? page.collection.headings : [];
+
+    expect(headings).not.toContain("Deja el primer comentario cancelar respuesta");
+    expect(headings.some((heading) => /comentario|También te puede interesar/i.test(heading))).toBe(
+      false,
+    );
+  });
+
+  it("is no recipe the article points at", () => {
+    const page = collection();
+    const ids = page.kind === "collection" ? page.collection.recipes.map((row) => row.id) : [];
+
+    expect(ids).not.toContain("tarta-de-comentario-inventada");
+  });
+
+  it("leaves an article free to name the same recipe twice", () => {
+    // A page names a recipe in its prose and again in a card underneath. Both
+    // point at one recipe, and the listing holds it once.
+    const page = collection();
+    const ids = page.kind === "collection" ? page.collection.recipes.map((row) => row.id) : [];
+
+    expect(ids).toEqual([...new Set(ids)]);
+    expect(ids).toContain("pure-de-calabacin-inventado");
+  });
+
+  it("is no part of a recipe either", () => {
+    const page = article();
+    const recipe = page.kind === "recipe" ? page.recipe : null;
+
+    expect(JSON.stringify(recipe)).not.toMatch(/comentario/i);
+  });
+});

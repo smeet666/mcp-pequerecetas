@@ -32,6 +32,16 @@ const DYNAMIC_FIELD = /jet-listing-dynamic-field__content"\s*>([\s\S]*?)<\/div>/
 const LINK = /<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
 const IMAGE_SRC = /<img[^>]*src="([^"]+)"/i;
 const TABLE_OF_CONTENTS = /<div[^>]*id="toc_container"[^>]*>[\s\S]*?<\/div>/gi;
+/**
+ * Where the article stops and the comment form begins.
+ *
+ * The theme prints the form inside the same container the article's own words
+ * are in, and it carries a heading and links of its own: an article read past
+ * this point comes back built from "Deja el primer comentario" and pointing at
+ * whatever a reader linked underneath.
+ */
+const COMMENTS =
+  /<div[^>]*(?:id="comments"|class="[^"]*(?:brxe-post-comments|comment-respond)[^"]*")/i;
 
 /** ISO 8601 durations, which is how the structured block states a time. */
 const ISO_DURATION = /^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?)?$/i;
@@ -391,7 +401,10 @@ function postContent(html: string): string {
   if (match === null) {
     return "";
   }
-  return html.slice(match.index + match[0].length);
+  const body = html.slice(match.index + match[0].length);
+  // What a reader wrote underneath is not what the page says about the dish.
+  const comments = COMMENTS.exec(body);
+  return comments === null ? body : body.slice(0, comments.index);
 }
 
 /**
