@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-09-03
+
+- **An article stops where its comment form begins.** The theme prints the form
+  inside the same container the article's own words are in, so a page came back
+  built from the heading "Deja el primer comentario" and pointing at whatever a
+  reader had linked underneath. Everything below that container is what readers
+  wrote, and none of it is what the page says about the dish.
+
 ## [1.0.0] - 2026-09-01
 
 The reading is settled: what a recipe page states, what it leaves out, and what
