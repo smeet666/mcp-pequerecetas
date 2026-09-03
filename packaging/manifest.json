@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "mcp-pequerecetas",
   "display_name": "Pequerecetas",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for Pequerecetas. Read Spanish family recipes and rescale their quantities. No API key required.",
   "long_description": "Read recipes from Pequerecetas, a Spanish home-cooking site written for families, in an MCP client. Search by dish or ingredient, read a recipe with its ingredients, steps and times, and browse the eight taxonomies the site files its recipes under, including the appliance a dish is cooked in and the age of whoever eats it, from six months up. Any recipe can be rescaled to another number of people, and every line says whether the arithmetic was exact or had to move to a quantity a kitchen can measure out. Read-only, no API key and no account.",
   "author": {
