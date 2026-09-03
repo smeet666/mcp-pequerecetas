@@ -47,6 +47,28 @@ const chrome = `
   <a href="${BASE}/receta/tarta-de-la-vecina-inventada/">Tarta de la vecina inventada</a>
 </div>`;
 
+/**
+ * The comment form the theme prints under an article.
+ *
+ * It sits inside the same container the article's own words are in, and carries
+ * a heading and links of its own. Anything read from the body has to stop
+ * before it, or an article comes back built from a heading nobody wrote about
+ * the dish.
+ */
+const comments = `
+<div class="brxe-post-comments">
+  <div id="comments">
+    <div class="bricks-comments-inner">
+      <div id="respond" class="comment-respond">
+        <h2 id="reply-title" class="comment-reply-title">Deja el primer comentario <small><a rel="nofollow" id="cancel-comment-reply-link" href="${BASE}/receta/12-pures-inventados/#respond">cancelar respuesta</a></small></h2>
+        <p class="comment-notes">Tu dirección no será publicada.</p>
+        <h3 class="comment-more">También te puede interesar</h3>
+        <a href="${BASE}/receta/tarta-de-comentario-inventada/">Tarta de comentario inventada</a>
+      </div>
+    </div>
+  </div>
+</div>`;
+
 const footer = `
 <footer class="site-footer">
   <a href="${BASE}/contacto/">Contacto</a>
@@ -68,7 +90,7 @@ function dynamicFields(values) {
  * The time, the servings and the energy are printed in that header, outside the
  * container the article's words sit in, which is where the site prints them.
  */
-function page({ title, head = "", header = "", body }) {
+function page({ title, head = "", header = "", body, commented = false }) {
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -84,6 +106,7 @@ ${header}
 </div>
 <div class="brxe-container post-content">
 ${body}
+${commented ? comments : ""}
 </div>
 </main>
 ${footer}
@@ -177,6 +200,7 @@ const structuredRecipe = {
 writeFileSync(
   join(out, "recipe-structured.html"),
   page({
+    commented: true,
     title: "Arroz caldoso de la tía Nube",
     head: ldJson([
       ...surroundingNodes("arroz-caldoso-tia-nube", "Arroz caldoso de la tía Nube"),
@@ -222,6 +246,7 @@ const articleRecipeNode = {
 writeFileSync(
   join(out, "recipe-article.html"),
   page({
+    commented: true,
     title: "Crema de calabaza con nueces inventada",
     head: ldJson([
       ...surroundingNodes("crema-calabaza-inventada", "Crema de calabaza con nueces inventada"),
@@ -322,6 +347,7 @@ writeFileSync(
 writeFileSync(
   join(out, "collection.html"),
   page({
+    commented: true,
     title: "12 purés inventados para bebés",
     head: ldJson([
       ...surroundingNodes("12-pures-inventados", "12 purés inventados para bebés"),
@@ -354,6 +380,9 @@ writeFileSync(
   <a href="${BASE}/receta/pure-de-zanahoria-inventado/">Puré de zanahoria inventado</a>
   <h2 class="wp-block-heading"><span id="Legumbres">Purés de legumbres inventados</span></h2>
   <a href="${BASE}/receta/pure-de-lentejas-inventado/">Puré de lentejas inventado</a>
+  <p class="wp-block-paragraph">Y para terminar, otra vez
+    <a href="${BASE}/receta/pure-de-calabacin-inventado/">el puré de calabacín</a>,
+    que un artículo nombra tantas veces como quiere.</p>
 </article>`,
   }),
 );
