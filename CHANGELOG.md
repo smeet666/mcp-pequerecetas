@@ -1,10 +1,18 @@
 # Changelog
 
+## 1.1.0
+
+- **The largest page this reads is a setting, and pages past it are refused.**
+  A deadline abandons a body that arrives slowly; one that arrives quickly and
+  large is never abandoned by it, and it lands in memory in one piece before
+  anything looks at it. The body is read in pieces and stopped at
+  `PQR_MAX_BODY_BYTES`, eight megabytes by default.
+
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.1] - 2026-09-03
+## [1.1.0] - 2026-09-03
 
 - **An article stops where its comment form begins.** The theme prints the form
   inside the same container the article's own words are in, so a page came back
