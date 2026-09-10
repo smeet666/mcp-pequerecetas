@@ -60,7 +60,7 @@ Node 24 or later is required, and no environment variable has to be set.
   "mcpServers": {
     "pequerecetas": {
       "command": "docker",
-      "args": ["run", "-i", "--rm", "ghcr.io/smeet666/mcp-pequerecetas:1.0.1"]
+      "args": ["run", "-i", "--rm", "ghcr.io/smeet666/mcp-pequerecetas:1.1.0"]
     }
   }
 }
@@ -72,7 +72,7 @@ because a TTY rewrites the stream. The container needs outbound HTTPS to
 
 ### Bundle, without npm
 
-Download `mcp-pequerecetas-1.0.1.mcpb` from
+Download `mcp-pequerecetas-1.1.0.mcpb` from
 [the latest release](https://github.com/smeet666/mcp-pequerecetas/releases/latest)
 and open it. A client that supports MCP bundles installs it on its own, with no
 npm and no configuration file to edit. The bundle carries its dependencies, so
@@ -207,15 +207,16 @@ the cook gives it.
 
 ## Configuration
 
-| Variable                | Default  | Bounds                     | What it does                                       |
-| ----------------------- | -------- | -------------------------- | -------------------------------------------------- |
-| `PQR_USER_AGENT`        | unset    |                            | Prefixed to this server's own User-Agent.          |
-| `PQR_MIN_INTERVAL_MS`   | `3000`   | 3000 to 60000              | Milliseconds between two requests.                 |
-| `PQR_TIMEOUT_MS`        | `20000`  | 1000 to 120000             | How long one request may take.                     |
-| `PQR_MAX_RETRIES`       | `3`      | 0 to 8                     | Attempts at a request the site did not answer.     |
-| `PQR_CACHE_TTL_MS`      | `900000` | 0 to 86400000              | How long a read is held. Zero turns the store off. |
-| `PQR_CACHE_MAX_ENTRIES` | `200`    | 1 to 5000                  | Reads held at once.                                |
-| `PQR_LOG_LEVEL`         | `error`  | silent, error, info, debug | What goes to stderr.                               |
+| Variable                | Default   | Bounds                     | What it does                                       |
+| ----------------------- | --------- | -------------------------- | -------------------------------------------------- |
+| `PQR_USER_AGENT`        | unset     |                            | Prefixed to this server's own User-Agent.          |
+| `PQR_MIN_INTERVAL_MS`   | `3000`    | 3000 to 60000              | Milliseconds between two requests.                 |
+| `PQR_TIMEOUT_MS`        | `20000`   | 1000 to 120000             | How long one request may take.                     |
+| `PQR_MAX_RETRIES`       | `3`       | 0 to 8                     | Attempts at a request the site did not answer.     |
+| `PQR_CACHE_TTL_MS`      | `900000`  | 0 to 86400000              | How long a read is held. Zero turns the store off. |
+| `PQR_CACHE_MAX_ENTRIES` | `200`     | 1 to 5000                  | Reads held at once.                                |
+| `PQR_MAX_BODY_BYTES`    | `8000000` | 100000 to 64000000         | Largest page this reads, in bytes.                 |
+| `PQR_LOG_LEVEL`         | `error`   | silent, error, info, debug | What goes to stderr.                               |
 
 The interval has a floor of 3000 milliseconds. A value below it is refused and
 the default stands, which is stated on stderr rather than applied in silence.
@@ -355,7 +356,7 @@ définir.
   "mcpServers": {
     "pequerecetas": {
       "command": "docker",
-      "args": ["run", "-i", "--rm", "ghcr.io/smeet666/mcp-pequerecetas:1.0.1"]
+      "args": ["run", "-i", "--rm", "ghcr.io/smeet666/mcp-pequerecetas:1.1.0"]
     }
   }
 }
@@ -368,7 +369,7 @@ port, aucun identifiant.
 
 ### Bundle, sans npm
 
-Télécharger `mcp-pequerecetas-1.0.1.mcpb` depuis
+Télécharger `mcp-pequerecetas-1.1.0.mcpb` depuis
 [la dernière publication](https://github.com/smeet666/mcp-pequerecetas/releases/latest)
 et l'ouvrir. Un client qui gère les bundles MCP l'installe seul, sans npm et sans
 fichier de configuration à modifier. Le bundle emporte ses dépendances, donc rien
@@ -518,6 +519,7 @@ la taille que lui donne le cuisinier.
 | `PQR_MAX_RETRIES`       | `3`        | 0 à 8                      | Tentatives sur une requête sans réponse.                   |
 | `PQR_CACHE_TTL_MS`      | `900000`   | 0 à 86400000               | Durée de conservation d'une lecture. Zéro éteint le cache. |
 | `PQR_CACHE_MAX_ENTRIES` | `200`      | 1 à 5000                   | Lectures gardées à la fois.                                |
+| `PQR_MAX_BODY_BYTES`    | `8000000`  | 100000 à 64000000          | Plus grande page lue, en octets.                           |
 | `PQR_LOG_LEVEL`         | `error`    | silent, error, info, debug | Ce qui part sur stderr.                                    |
 
 L'intervalle a un plancher de 3000 millisecondes. Une valeur en dessous est
