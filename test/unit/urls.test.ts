@@ -124,7 +124,9 @@ describe("FACET_NAMES", () => {
   });
 
   it("is in a fixed order, so a listing of facets never shuffles between calls", () => {
-    expect([...FACET_NAMES]).toEqual([...FACET_NAMES].sort());
+    expect([...FACET_NAMES]).toEqual(
+      [...FACET_NAMES].sort((a, b) => Number(a > b) - Number(a < b)),
+    );
   });
 
   it("recognises a name the site publishes", () => {
